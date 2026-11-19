@@ -2,6 +2,8 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
+  // Hide the dev toolbar Astro overlays on pages during `npm run dev`. It never appears in production builds.
+  devToolbar: { enabled: false },
   build: {
     // Output projects.html rather than projects/index.html, so existing links keep working.
     format: 'file',
