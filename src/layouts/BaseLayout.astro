@@ -33,7 +33,9 @@ const screen = page === 'home';
       <Backdrop fixed={!screen} />
       <div
         class:list={[
-          'relative z-2 flex flex-col px-[clamp(20px,5vw,72px)] py-[clamp(20px,4vw,48px)]',
+          'relative z-2 flex flex-col px-[clamp(1.25rem,5vw,4.5rem)] py-[clamp(1.25rem,4vw,3rem)]',
+          // Content stops spreading at 1440px (padding included) and centres; the scene still fills the screen.
+          'mx-auto w-full max-w-360',
           // svh: the visible screen height on phones, excluding the browser toolbar.
           screen ? 'min-h-svh justify-between gap-6 short:py-8' : 'min-h-screen gap-12',
         ]}

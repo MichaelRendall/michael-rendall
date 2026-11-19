@@ -17,28 +17,28 @@ const [from, to] = project.previewColours;
 <article
   data-anim="intro"
   class:list={[
-    'flex max-w-[444px] flex-[1_1_344px] flex-col border-2 border-ink bg-paper shadow-hard-8',
+    'flex max-w-111 flex-[1_1_21.5rem] flex-col border-2 border-ink bg-paper shadow-hard-8',
     shadows[project.shadow],
   ]}
 >
   <TitleBar size="sm" controls={2}>
-    <span class="font-terminal text-[20px]">{project.file}</span>
+    <span class="font-terminal text-label">{project.file}</span>
   </TitleBar>
   <div
-    class="flex h-[202px] flex-col items-center justify-center gap-2.5 border-b-2 border-ink bg-linear-135/srgb from-(--from) to-(--to)"
+    class="flex h-50.5 flex-col items-center justify-center gap-2.5 border-b-2 border-ink bg-linear-135/srgb from-(--from) to-(--to)"
     style={{ '--from': from, '--to': to }}
   >
-    <Icon name={project.icon} size={56} strokeWidth={1.6} />
-    <span class="font-terminal text-[20px] tracking-[1px]">[SCREENSHOT OR GIF]</span>
+    <Icon name={project.icon} size="xl" strokeWidth={1.6} />
+    <span class="font-terminal text-label tracking-label">[SCREENSHOT OR GIF]</span>
   </div>
-  <div class="flex grow flex-col gap-3 p-[22px]">
-    <h2 class="font-pixel text-[26px] leading-[1.15] font-bold">{project.name}</h2>
-    <p class="text-[16px] leading-[1.55] text-ink-soft">{project.summary}</p>
+  <div class="flex grow flex-col gap-3 p-5.5">
+    <h2 class="font-pixel text-title leading-[1.15] font-bold">{project.name}</h2>
+    <p class="text-body leading-[1.55] text-ink-soft">{project.summary}</p>
     <div class="flex flex-wrap gap-2">
       {project.tags.map((tag, i) => (
         <span
           class:list={[
-            'border-2 border-ink px-2.5 py-0.5 font-terminal text-[18px]',
+            'border-2 border-ink px-2.5 py-0.5 font-terminal text-label-xs',
             tagColours[i % tagColours.length],
           ]}
         >

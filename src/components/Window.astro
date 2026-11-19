@@ -14,7 +14,7 @@ const { as: Tag = 'section', title, class: className, ...attrs } = Astro.props;
 
 <Tag data-anim="window" class:list={['border-2 border-ink bg-paper', className]} {...attrs}>
   <TitleBar>
-    <span class="font-terminal text-[22px] tracking-[1px]">{title}</span>
+    <span class="font-terminal text-label-lg tracking-label">{title}</span>
   </TitleBar>
   <slot />
 </Tag>

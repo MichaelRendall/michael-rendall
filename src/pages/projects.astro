@@ -12,13 +12,13 @@ import { featuredProjects, moreProjects } from '../data/projects';
   title="Projects, Michael Rendall"
   description="Games, puzzles and experiments built by Michael Rendall."
 >
-  <Window title="C:\projects" aria-labelledby="proj-title" class="max-w-[724px] shadow-hard-10">
-    <div class="flex flex-col gap-3.5 p-[clamp(24px,3vw,36px)]">
-      <p class="font-terminal text-[24px] tracking-[2px] text-accent">✦ GAMES, PUZZLES &amp; EXPERIMENTS ✦</p>
-      <h1 id="proj-title" class="text-chrome font-pixel text-[clamp(40px,5vw,74px)] leading-[1.08] font-bold">
+  <Window title="C:\projects" aria-labelledby="proj-title" class="max-w-181 shadow-hard-10">
+    <div class="flex flex-col gap-3.5 p-[clamp(1.5rem,3vw,2.25rem)]">
+      <p class="font-terminal text-label-xl tracking-label-wide text-accent">✦ GAMES, PUZZLES &amp; EXPERIMENTS ✦</p>
+      <h1 id="proj-title" class="text-chrome font-pixel text-display leading-[1.08] font-bold">
         Projects
       </h1>
-      <p class="max-w-[540px] text-[18px] leading-[1.6] text-ink-soft">
+      <p class="max-w-135 text-body-lg leading-[1.6] text-ink-soft">
         Things I've built for fun. Each one has a short write-up on how it works and what I'd do differently next time.
       </p>
     </div>
@@ -33,13 +33,13 @@ import { featuredProjects, moreProjects } from '../data/projects';
   <section
     data-anim="intro"
     aria-labelledby="more-title"
-    class="max-w-[984px] border-2 border-ink bg-paper shadow-hard-8 shadow-pink"
+    class="max-w-246 border-2 border-ink bg-paper shadow-hard-8 shadow-pink"
   >
     <TitleBar size="md" reverse>
-      <h2 id="more-title" class="font-terminal text-[21px] font-normal tracking-[1px]">
+      <h2 id="more-title" class="font-terminal text-label-md font-normal tracking-label">
         more_projects.dir
       </h2>
-      <span slot="end" class="font-terminal text-[19px]">
+      <span slot="end" class="font-terminal text-label-sm">
         {moreProjects.length} items
       </span>
     </TitleBar>

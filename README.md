@@ -57,7 +57,9 @@ Vercel builds the site on every push to the connected Git repository. Production
 
 - Styles are Tailwind classes in the components. Colours, fonts and shadows are named tokens (`text-ink`, `bg-paper`, `font-terminal`, `shadow-hard-4 shadow-pink`), so avoid hex values in markup.
 - The retro offset shadows are `shadow-hard-3/4/8/10`. They're mint by default; add `shadow-pink` or `shadow-lilac` to recolour them.
-- Pixel sizes like `text-[22px]` are deliberate. They match the original design, and they don't set a line height the way Tailwind's named sizes (`text-base` and so on) do.
+- Sizes are in rem (and letter-spacing in em), so the site follows the visitor's browser font size. Use the named type sizes from `global.css` (`text-label`, `text-body`, `text-title`, `text-display` and so on) rather than Tailwind's defaults. Ours don't set a line height, so text keeps the design's `normal` line height unless you add a `leading-*` class.
+- Px is used only where it's best practice: borders, focus outlines, the hard offset shadows, the scanlines and GSAP motion distances. These are fine details that should stay crisp, not grow with the text.
+- Use the `short:` variant to tighten layouts on laptop-width screens that are 800px tall or less.
 - Animation hooks are `data-anim="intro" | "window" | "pulse"` attributes, kept separate from styling classes. Inside the scene SVG, GSAP targets the `vw-*` class names and `data-vw-layer` attributes.
 
 ## Before you publish

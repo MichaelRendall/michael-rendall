@@ -14,11 +14,11 @@ interface Props {
 const { href, variant = 'primary', size = 'md', icon, current = false } = Astro.props;
 
 const looks = {
-  nav: ['font-terminal text-[22px] tracking-[1px]', current ? 'bg-mint-light shadow-pink' : 'bg-paper'],
-  primary: ['bg-pink-light font-semibold', size === 'lg' ? 'text-[16px]' : 'text-[15px]'],
-  secondary: ['bg-mint-pale shadow-pink font-semibold', size === 'lg' ? 'text-[16px]' : 'text-[15px]'],
+  nav: ['font-terminal text-label-lg tracking-label', current ? 'bg-mint-light shadow-pink' : 'bg-paper'],
+  primary: ['bg-pink-light font-semibold', size === 'lg' ? 'text-body' : 'text-body-sm'],
+  secondary: ['bg-mint-pale shadow-pink font-semibold', size === 'lg' ? 'text-body' : 'text-body-sm'],
 };
-const iconSize = variant !== 'nav' && size === 'md' ? 16 : 18;
+const iconSize = variant !== 'nav' && size === 'md' ? 'sm' : 'md';
 ---
 
 <a

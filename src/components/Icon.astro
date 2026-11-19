@@ -39,19 +39,26 @@ const icons = {
 
 export type IconName = keyof typeof icons;
 
+// Sizes in rem, so icons scale with the visitor's browser font size.
+const sizes = {
+  sm: 'size-4', // 16px at default font size
+  md: 'size-4.5', // 18px
+  lg: 'size-5.5', // 22px
+  xl: 'size-14', // 56px
+};
+
 interface Props {
   name: IconName;
-  size?: number;
+  size?: keyof typeof sizes;
   strokeWidth?: number;
 }
 
-const { name, size = 18, strokeWidth = 2 } = Astro.props;
+const { name, size = 'md', strokeWidth = 2 } = Astro.props;
 const icon: IconDef = icons[name];
 ---
 
 <svg
-  width={size}
-  height={size}
+  class={sizes[size]}
   viewBox="0 0 24 24"
   fill="none"
   stroke="currentColor"
