@@ -1,0 +1,50 @@
+---
+import '../styles/global.css';
+import Backdrop from '../components/Backdrop.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  page: 'home' | 'projects';
+}
+
+const { title, description, page } = Astro.props;
+
+// Home is a single full-screen view; other pages scroll over a fixed scene.
+const screen = page === 'home';
+---
+<!doctype html>
+<html lang="en-GB" class="scroll-smooth motion-reduce:scroll-auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="description" content={description}>
+</head>
+<body>
+<div
+  data-vw-root
+  class:list={[
+    'relative w-full font-sans text-ink',
+    screen ? 'h-screen min-h-[680px] overflow-hidden bg-page' : 'min-h-screen',
+  ]}
+>
+  <Backdrop fixed={!screen} />
+  <div
+    class:list={[
+      'relative z-2 flex flex-col px-[clamp(20px,5vw,72px)] py-[clamp(20px,4vw,48px)]',
+      screen ? 'h-full justify-between gap-6' : 'min-h-screen gap-12',
+    ]}
+  >
+    <SiteHeader current={page} />
+    <slot />
+    <SiteFooter pinBottom={!screen} />
+  </div>
+</div>
+<script>
+  import '../scripts/main.ts';
+</script>
+</body>
+</html>

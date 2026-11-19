@@ -1,48 +1,59 @@
 # Michael Rendall: portfolio
 
-A two-page static site with a pastel vaporwave look. It uses HTML, CSS and TypeScript, plus GSAP for the gentle motion. Vite handles the dev server and production build, and the site deploys to Vercel.
+A two-page static site with a pastel vaporwave look. It's built with [Astro](https://astro.build), Tailwind CSS v4 and TypeScript, with GSAP for the gentle motion. It deploys to Vercel as plain static files.
 
-## Files
+## Project layout
 
-- `index.html`: the homepage, with the intro window and contact links
-- `projects.html`: three featured project cards and a list of other projects
-- `src/styles.css`: shared styles (accent colour, retro buttons and boxes, scanlines)
-- `src/main.ts`: the footer clock (always Glasgow time), the current year, and all the GSAP animation
-- `public/`: files copied to the site root unchanged (favicon, `robots.txt`, images)
-- `vite.config.ts`: build config. Every HTML page must be listed under `input`.
-- `vercel.json`: Vercel build settings and caching for hashed assets
+```
+src/
+  pages/          index.astro and projects.astro. Each file is a page.
+  layouts/        BaseLayout.astro: <head>, scene, header and footer shared by every page
+  components/     Scene (the beach SVG), Backdrop, SiteHeader, SiteFooter, Window,
+                  TitleBar, Button, Icon, ProjectCard, ProjectListItem
+  data/           projects.ts: the content for the projects page
+  scripts/        main.ts: footer clock (Glasgow time), year, and all GSAP animation
+  styles/         global.css: Tailwind, fonts, colour and shadow tokens
+public/           Files copied to the site root unchanged (favicon, robots.txt, images)
+```
 
 ## Run it
 
-You need Node 22 (see `.nvmrc`).
+You need Node 24 (see `.nvmrc`). Astro needs at least 22.23.4.
 
 ```
 npm install
-npm run dev        # dev server with hot reload
-npm run build      # typecheck, then build to dist/
+npm run dev        # dev server with hot reload at http://localhost:4321
+npm run build      # type-check, then build to dist/
 npm run preview    # serve the built dist/ locally
-npm run typecheck  # typecheck only
+npm run check      # type-check only
 ```
 
 ## Deploy
 
 Vercel builds the site on every push to the connected Git repository. Production deploys come from the default branch, and every other branch gets a preview URL. To deploy without Git, run `npx vercel` (preview) or `npx vercel --prod`.
 
-## Adding a page
+## Common changes
 
-1. Create the HTML file in the project root, with `<link rel="stylesheet" href="/src/styles.css">` and `<script type="module" src="/src/main.ts"></script>` in the head.
-2. Add it to `build.rollupOptions.input` in `vite.config.ts`. Pages left out of that list are missing from the build.
+- **Add or edit a project:** edit `src/data/projects.ts`. The cards and the list are built from it.
+- **Add a page:** create `src/pages/<name>.astro` and wrap it in `<BaseLayout>`. It builds to `/<name>.html`. Add a link in `SiteHeader.astro`, and add the page to `BaseLayout`'s `page` prop type.
+- **Change colours or fonts:** edit the `@theme` block in `src/styles/global.css`. Every `bg-*`, `text-*`, `border-*` and `shadow-*` class picks up the change.
+- **Swap a font:** install it from [Fontsource](https://fontsource.org) (`npm install @fontsource/<font-name>`), replace its `@import` in `global.css`, and update `--font-pixel`, `--font-terminal` or `--font-sans`.
+
+## Styling conventions
+
+- Styles are Tailwind classes in the components. Colours, fonts and shadows are named tokens (`text-ink`, `bg-paper`, `font-terminal`, `shadow-hard-4 shadow-pink`), so avoid hex values in markup.
+- The retro offset shadows are `shadow-hard-3/4/8/10`. They're mint by default; add `shadow-pink` or `shadow-lilac` to recolour them.
+- Pixel sizes like `text-[22px]` are deliberate. They match the original design, and they don't set a line height the way Tailwind's named sizes (`text-base` and so on) do.
+- Animation hooks are `data-anim="intro" | "window" | "pulse"` attributes, kept separate from styling classes. Inside the scene SVG, GSAP targets the `vw-*` class names and `data-vw-layer` attributes.
 
 ## Before you publish
 
 - Replace the text in square brackets: [WHAT YOU BUILD], [PROJECT NAME], [TECH], [YEAR] and [SCREENSHOT OR GIF].
-- Update the contact links. They currently point to hello@example.com, github.com and linkedin.com.
-- Change the accent colour by editing `--accent` in `src/styles.css`.
-- Fonts are self-hosted with [Fontsource](https://fontsource.org). To use a different heading font, install its package (`npm install @fontsource/<font-name>`), swap the `@import` lines at the top of `src/styles.css`, and replace `'Silkscreen'` in both HTML files.
+- Update the contact links in `src/pages/index.astro`. They currently point to hello@example.com, github.com and linkedin.com.
+- Add a favicon to `public/`.
 
 ## Notes
 
 - The animation respects `prefers-reduced-motion`. Visitors who turn motion off see a still scene.
 - If JavaScript or GSAP fails to load, the page still shows in full. Only the motion is lost.
-- The beach scene is inline SVG, copied into both pages. If you move to React or another framework, make the scene, the header and the window into shared components so it lives in one place.
-- Most styles are inline because the design was exported from a prototype. Moving the repeated ones (window title bars, buttons, tags) into classes in `src/styles.css` is a good first tidy-up.
+- Astro ships no JavaScript of its own. The only script on the page is `main.ts`.

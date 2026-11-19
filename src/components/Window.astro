@@ -1,0 +1,19 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import TitleBar from './TitleBar.astro';
+
+// The big retro window that opens each page. It animates in (see src/scripts/main.ts).
+interface Props extends HTMLAttributes<'section'> {
+  as?: 'main' | 'section';
+  /** Text in the title bar, styled like a file name. */
+  title: string;
+}
+
+const { as: Tag = 'section', title, class: className, ...attrs } = Astro.props;
+---
+<Tag data-anim="window" class:list={['border-2 border-ink bg-paper', className]} {...attrs}>
+  <TitleBar>
+    <span class="font-terminal text-[22px] tracking-[1px]">{title}</span>
+  </TitleBar>
+  <slot />
+</Tag>

@@ -26,8 +26,8 @@ function initMotion(root: HTMLElement): void {
   tl.from(q('[data-vw-layer="moon"]'), { y: 30, opacity: 0, duration: 2, ease: 'expo.out' }, 0)
     .from(q('[data-vw-layer="clouds"]'), { opacity: 0, duration: 1.6 }, 0)
     .from(q('[data-vw-layer="palms"]'), { y: 40, duration: 1.6 }, 0.1)
-    .from(q('.vw-window'), { y: 28, opacity: 0, duration: 0.9, clearProps: 'transform,opacity' }, 0.5)
-    .from(q('.vw-intro'), { y: 14, opacity: 0, duration: 0.8, stagger: 0.1, clearProps: 'transform,opacity' }, 0.8);
+    .from(q('[data-anim="window"]'), { y: 28, opacity: 0, duration: 0.9, clearProps: 'transform,opacity' }, 0.5)
+    .from(q('[data-anim="intro"]'), { y: 14, opacity: 0, duration: 0.8, stagger: 0.1, clearProps: 'transform,opacity' }, 0.8);
 
   // Ambient: slow, small, looping
   q('.vw-cloud-g').forEach((el, i) => {
@@ -44,7 +44,7 @@ function initMotion(root: HTMLElement): void {
   gsap.to(q('.vw-spark'), { opacity: 0.1, duration: 1.4, ease: 'sine.inOut', stagger: { each: 0.04, from: 'random', yoyo: true, repeat: -1 } });
   gsap.to(q('.vw-twinkle'), { opacity: 0.2, duration: 1.8, ease: 'sine.inOut', stagger: { each: 0.25, from: 'random', yoyo: true, repeat: -1 } });
   gsap.to(q('.vw-glint'), { scaleX: 0.85, transformOrigin: '50% 50%', duration: 2.4, ease: 'sine.inOut', stagger: { each: 0.3, yoyo: true, repeat: -1 } });
-  gsap.to(q('.vw-dot'), { boxShadow: '0 0 0 8px rgba(31,184,168,0)', duration: 1.6, ease: 'sine.out', repeat: -1 });
+  gsap.to(q('[data-anim="pulse"]'), { boxShadow: '0 0 0 8px rgba(31,184,168,0)', duration: 1.6, ease: 'sine.out', repeat: -1 });
   gsap.to(q('.vw-halo'), { opacity: 0.6, duration: 4, ease: 'sine.inOut', yoyo: true, repeat: -1 });
   gsap.to(q('.vw-foam'), { strokeDashoffset: -222, duration: 14, ease: 'none', repeat: -1 });
   gsap.to(q('.vw-screen'), { opacity: 0.82, duration: 0.12, ease: 'none', yoyo: true, repeat: -1, repeatDelay: 3.5 });
