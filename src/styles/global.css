@@ -1,0 +1,77 @@
+@import 'tailwindcss';
+
+/* Self-hosted fonts (Fontsource). Each file covers every subset, but browsers only download the ones a page needs. */
+@import '@fontsource/silkscreen/400.css';
+@import '@fontsource/silkscreen/700.css';
+@import '@fontsource/space-grotesk/400.css';
+@import '@fontsource/space-grotesk/500.css';
+@import '@fontsource/space-grotesk/600.css';
+@import '@fontsource/vt323/400.css';
+
+@theme {
+  /* Fonts */
+  --font-sans: 'Space Grotesk', system-ui, sans-serif;
+  --font-pixel: 'Silkscreen', monospace; /* headings */
+  --font-terminal: 'VT323', monospace; /* labels, title bars, nav */
+
+  /* Ink */
+  --color-ink: #2a1347; /* text and borders */
+  --color-ink-soft: #3a2560; /* body copy */
+  --color-accent: #11807b; /* eyebrow text */
+  --color-violet: #8a4fe0; /* focus ring */
+
+  /* Surfaces */
+  --color-page: #f6b8d8;
+  --color-paper: #fff4fa; /* window and chip backgrounds */
+  --color-blush: #fbe7f3; /* alternate list rows */
+
+  /* Pastels */
+  --color-pink: #ff8fcf;
+  --color-pink-light: #ffc6e6;
+  --color-pink-mist: #ffe0ef;
+  --color-mint: #7ff6ea;
+  --color-mint-light: #9ff3ec;
+  --color-mint-pale: #c9f5f1;
+  --color-mint-mist: #d8f7f3;
+  --color-sky: #8fe9f0;
+  --color-lilac: #c3a6ff;
+  --color-lilac-mist: #e6dcff;
+  --color-teal: #1fb8a8;
+
+  /* Hard offset shadows. Mint by default; recolour with shadow-pink, shadow-lilac and so on. */
+  --shadow-hard-3: 3px 3px 0 #7ff6ea;
+  --shadow-hard-4: 4px 4px 0 #7ff6ea;
+  --shadow-hard-5: 5px 5px 0 #7ff6ea;
+  --shadow-hard-8: 8px 8px 0 #7ff6ea;
+  --shadow-hard-10: 10px 10px 0 #7ff6ea;
+}
+
+@layer base {
+  /* The design was tuned on the browser's default line height, not Tailwind's 1.5. */
+  html {
+    line-height: normal;
+  }
+
+  body {
+    background-color: var(--color-page);
+  }
+}
+
+/* Pink-to-teal gradient lettering for page titles. */
+@utility text-chrome {
+  background: linear-gradient(100deg, #d0358f 0%, #8a4fe0 50%, #12908a 100%);
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(2px 2px 0 var(--color-pink-light));
+}
+
+/* Faint CRT scanlines over the scene. */
+@utility bg-scanlines {
+  background: repeating-linear-gradient(
+    180deg,
+    rgb(42 19 71 / 0.03) 0px,
+    rgb(42 19 71 / 0.03) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}

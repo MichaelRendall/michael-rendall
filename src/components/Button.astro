@@ -1,0 +1,39 @@
+---
+import Icon, { type IconName } from './Icon.astro';
+
+interface Props {
+  href: string;
+  /** nav: pixel-font header link. primary: pink. secondary: mint. */
+  variant?: 'nav' | 'primary' | 'secondary';
+  size?: 'md' | 'lg';
+  icon?: IconName;
+  /** Marks the nav link for the current page. */
+  current?: boolean;
+}
+
+const { href, variant = 'primary', size = 'md', icon, current = false } = Astro.props;
+
+const looks = {
+  nav: ['font-terminal text-[22px] tracking-[1px]', current ? 'bg-mint-light shadow-pink' : 'bg-paper'],
+  primary: ['bg-pink-light font-semibold', size === 'lg' ? 'text-[16px]' : 'text-[15px]'],
+  secondary: ['bg-mint-pale shadow-pink font-semibold', size === 'lg' ? 'text-[16px]' : 'text-[15px]'],
+};
+const iconSize = variant !== 'nav' && size === 'md' ? 16 : 18;
+---
+
+<a
+  href={href}
+  aria-current={current ? 'page' : undefined}
+  class:list={[
+    'inline-flex items-center border-2 border-ink text-ink shadow-hard-3',
+    // Hover: mint fill, deeper pink shadow and a small lift. With reduced motion, the colours still change but nothing moves.
+    'transition-[background-color,box-shadow,translate] duration-150 hover:-translate-0.5 hover:bg-mint-light hover:shadow-hard-5 hover:shadow-pink',
+    'motion-reduce:transition-none motion-reduce:hover:translate-none',
+    'focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-violet',
+    size === 'lg' ? 'min-h-13 gap-2.5 px-5' : 'min-h-12 gap-2 px-4',
+    looks[variant],
+  ]}
+>
+  {icon && <Icon name={icon} size={iconSize} />}
+  <slot />
+</a>
