@@ -12,7 +12,8 @@ interface Props {
 
 const { title, description, page } = Astro.props;
 
-// Home is a single full-screen view; other pages scroll over a fixed scene.
+// Home fills at least one screen and grows (and scrolls) if its content needs more room.
+// Other pages scroll over a fixed scene.
 const screen = page === 'home';
 ---
 
@@ -27,16 +28,14 @@ const screen = page === 'home';
   <body>
     <div
       data-vw-root
-      class:list={[
-        'relative w-full font-sans text-ink',
-        screen ? 'h-screen min-h-[680px] overflow-hidden bg-page' : 'min-h-screen',
-      ]}
+      class:list={['relative w-full font-sans text-ink', screen ? 'overflow-x-clip bg-page' : 'min-h-screen']}
     >
       <Backdrop fixed={!screen} />
       <div
         class:list={[
           'relative z-2 flex flex-col px-[clamp(20px,5vw,72px)] py-[clamp(20px,4vw,48px)]',
-          screen ? 'h-full justify-between gap-6' : 'min-h-screen gap-12',
+          // svh: the visible screen height on phones, excluding the browser toolbar.
+          screen ? 'min-h-svh justify-between gap-6 short:py-8' : 'min-h-screen gap-12',
         ]}
       >
         <SiteHeader current={page} />

@@ -8,6 +8,9 @@
 @import '@fontsource/space-grotesk/600.css';
 @import '@fontsource/vt323/400.css';
 
+/* Laptop-width screens with little height (e.g. 1366x768, 1280x800). Tightens the home page so it fits without scrolling. */
+@custom-variant short (@media (min-width: 48rem) and (max-height: 50rem));
+
 @theme {
   /* Fonts */
   --font-sans: 'Space Grotesk', system-ui, sans-serif;
