@@ -9,7 +9,12 @@ interface Props {
 const { pinBottom = false } = Astro.props;
 const chip = 'border-2 border-ink bg-paper px-3 py-1 font-terminal text-[20px] tracking-[1px] shadow-hard-4';
 ---
+
 <footer data-anim="intro" class:list={['flex flex-wrap justify-between gap-3', pinBottom && 'mt-auto']}>
-  <span class={chip}>Glasgow ▸ local time <time data-clock>--:--</time></span>
-  <span class={chip}>© <span data-year>{new Date().getFullYear()}</span> Michael Rendall</span>
+  <span class={chip}>
+    Glasgow ▸ local time <time data-clock>--:--</time>
+  </span>
+  <span class={chip}>
+    © <span data-year>{new Date().getFullYear()}</span> Michael Rendall
+  </span>
 </footer>

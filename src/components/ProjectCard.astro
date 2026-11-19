@@ -13,9 +13,13 @@ const shadows = { mint: '', pink: 'shadow-pink', lilac: 'shadow-lilac' };
 const tagColours = ['bg-lilac-mist', 'bg-mint-mist', 'bg-pink-mist'];
 const [from, to] = project.previewColours;
 ---
+
 <article
   data-anim="intro"
-  class:list={['flex max-w-[444px] flex-[1_1_344px] flex-col border-2 border-ink bg-paper shadow-hard-8', shadows[project.shadow]]}
+  class:list={[
+    'flex max-w-[444px] flex-[1_1_344px] flex-col border-2 border-ink bg-paper shadow-hard-8',
+    shadows[project.shadow],
+  ]}
 >
   <TitleBar size="sm" controls={2}>
     <span class="font-terminal text-[20px]">{project.file}</span>
@@ -32,12 +36,23 @@ const [from, to] = project.previewColours;
     <p class="text-[16px] leading-[1.55] text-ink-soft">{project.summary}</p>
     <div class="flex flex-wrap gap-2">
       {project.tags.map((tag, i) => (
-        <span class:list={['border-2 border-ink px-2.5 py-0.5 font-terminal text-[18px]', tagColours[i % tagColours.length]]}>{tag}</span>
+        <span
+          class:list={[
+            'border-2 border-ink px-2.5 py-0.5 font-terminal text-[18px]',
+            tagColours[i % tagColours.length],
+          ]}
+        >
+          {tag}
+        </span>
       ))}
     </div>
     <div class="mt-auto flex flex-wrap gap-3 pt-1.5">
-      <Button href={project.demoUrl} icon="play">Play demo<span class="sr-only">: {project.name}</span></Button>
-      <Button href={project.codeUrl} variant="secondary" icon="code">View code<span class="sr-only">: {project.name}</span></Button>
+      <Button href={project.demoUrl} icon="play">
+        Play demo<span class="sr-only">: {project.name}</span>
+      </Button>
+      <Button href={project.codeUrl} variant="secondary" icon="code">
+        View code<span class="sr-only">: {project.name}</span>
+      </Button>
     </div>
   </div>
 </article>

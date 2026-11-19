@@ -67,5 +67,11 @@
 
 /* Faint CRT scanlines over the scene. */
 @utility bg-scanlines {
-  background: repeating-linear-gradient(180deg, rgb(42 19 71 / 0.03) 0px, rgb(42 19 71 / 0.03) 1px, transparent 1px, transparent 3px);
+  background: repeating-linear-gradient(
+    180deg,
+    rgb(42 19 71 / 0.03) 0px,
+    rgb(42 19 71 / 0.03) 1px,
+    transparent 1px,
+    transparent 3px
+  );
 }

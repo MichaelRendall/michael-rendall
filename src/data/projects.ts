@@ -40,6 +40,11 @@ export const featuredProjects: FeaturedProject[] = [
   { ...placeholder, file: 'project_03.exe', icon: 'grid', previewColours: ['#d9c8ff', '#9ff3ec'], shadow: 'lilac' },
 ];
 
-const morePlaceholder: MoreProject = { name: '[PROJECT NAME]', tech: ['[TECH]', '[TECH]'], year: '[YEAR]', url: 'https://github.com/' };
+const morePlaceholder: MoreProject = {
+  name: '[PROJECT NAME]',
+  tech: ['[TECH]', '[TECH]'],
+  year: '[YEAR]',
+  url: 'https://github.com/',
+};
 
 export const moreProjects: MoreProject[] = [morePlaceholder, morePlaceholder, morePlaceholder, morePlaceholder];

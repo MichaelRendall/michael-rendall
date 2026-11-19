@@ -26,7 +26,21 @@ npm run dev        # dev server with hot reload at http://localhost:4321
 npm run build      # type-check, then build to dist/
 npm run preview    # serve the built dist/ locally
 npm run check      # type-check only
+npm run lint       # ESLint, including accessibility rules for .astro markup
+npm run lint:fix   # ESLint with auto-fix
+npm run format     # format everything with Prettier (also sorts Tailwind classes)
+npm run verify     # format check, lint, type-check and build: run before you push
 ```
+
+### Editor setup
+
+Open the folder in VS Code and install the recommended extensions when prompted (Astro, Prettier, ESLint, Tailwind CSS IntelliSense). The workspace settings format on save and apply ESLint fixes on save.
+
+### Tooling notes
+
+- ESLint uses `eslint-plugin-jsx-a11y-x`, a maintained fork of `eslint-plugin-jsx-a11y` that supports ESLint 10. `package.json` overrides its `minimatch` dependency to a patched version. Remove the override once the plugin ships the fix itself.
+- TypeScript is pinned to 6.x because `@astrojs/check` doesn't support TypeScript 7 yet.
+- `Scene.astro` is excluded from Prettier so the SVG artwork keeps its exported layout.
 
 ## Deploy
 
