@@ -38,7 +38,7 @@ Vercel builds the site on every push to the connected Git repository. Production
 - Replace the text in square brackets: [WHAT YOU BUILD], [PROJECT NAME], [TECH], [YEAR] and [SCREENSHOT OR GIF].
 - Update the contact links. They currently point to hello@example.com, github.com and linkedin.com.
 - Change the accent colour by editing `--accent` in `src/styles.css`.
-- To use a different heading font, swap `'Silkscreen'` in both HTML files and update the Google Fonts link.
+- Fonts are self-hosted with [Fontsource](https://fontsource.org). To use a different heading font, install its package (`npm install @fontsource/<font-name>`), swap the `@import` lines at the top of `src/styles.css`, and replace `'Silkscreen'` in both HTML files.
 
 ## Notes
 

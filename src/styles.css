@@ -1,3 +1,11 @@
+/* Self-hosted fonts (Fontsource). Each file covers every subset, but browsers only download the ones a page needs. */
+@import '@fontsource/silkscreen/400.css';
+@import '@fontsource/silkscreen/700.css';
+@import '@fontsource/space-grotesk/400.css';
+@import '@fontsource/space-grotesk/500.css';
+@import '@fontsource/space-grotesk/600.css';
+@import '@fontsource/vt323/400.css';
+
 :root{--accent:#11807b}
 body{margin:0;background:#f6b8d8}
 html{scroll-behavior:smooth}
@@ -9,4 +17,4 @@ a{color:#2a1347}a:hover{color:#2a1347}
 .vw-btn{transition:background-color .15s ease,box-shadow .15s ease,transform .15s ease}
 .vw-btn:hover{background-color:#9ff3ec;box-shadow:5px 5px 0 #ff8fcf;transform:translate(-2px,-2px)}
 .vw-btn:focus-visible{outline:3px solid #8a4fe0;outline-offset:3px}
-@media (prefers-reduced-motion: reduce){.vw-btn,.vw-btn:hover{background-color:#9ff3ec;box-shadow:5px 5px 0 #ff8fcf;transform:translate(-2px,-2px)}
+@media (prefers-reduced-motion: reduce){.vw-btn{transition:none}.vw-btn:hover{transform:none}}
