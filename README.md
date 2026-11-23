@@ -1,6 +1,6 @@
 # Michael Rendall
 
-A personal site for games, quizzes and small tools, with a pastel vaporwave look. It's built with [Astro](https://astro.build), Tailwind CSS v4 and TypeScript, with GSAP for the gentle motion. It deploys to Vercel as plain static files.
+A personal site for games, quizzes and small tools, with a pastel vaporwave look. It's built with [Astro](https://astro.build), Tailwind CSS v4 and TypeScript. It deploys to Vercel as plain static files.
 
 ## Project layout
 
@@ -13,7 +13,7 @@ src/
                   quiz/: Quiz and QuizSettings, the screens and settings pop-up every quiz shares
   data/           quizzes.ts: the cards on the quizzes page. countries.ts: the countries every quiz uses.
                   capitals.ts: capitals and the cities offered as wrong answers
-  scripts/        main.ts: footer clock (Glasgow time), year, and all GSAP animation
+  scripts/        main.ts: footer clock (Glasgow time) and year
                   quiz/: the shared quiz engine, settings and answer matching, plus one
                   definition per quiz (flags.ts, capitals.ts)
   styles/         global.css: Tailwind, fonts, colour and shadow tokens
@@ -63,12 +63,12 @@ Vercel builds the site on every push to the connected Git repository. Production
 - Styles are Tailwind classes in the components. Colours, fonts and shadows are named tokens (`text-ink`, `bg-paper`, `font-terminal`, `shadow-hard-4 shadow-pink`), so avoid hex values in markup.
 - The retro offset shadows are `shadow-hard-3/4/8/10`. They're mint by default; add `shadow-pink` or `shadow-lilac` to recolour them.
 - Sizes are in rem (and letter-spacing in em), so the site follows the visitor's browser font size. Use the named type sizes from `global.css` (`text-label`, `text-body`, `text-title`, `text-display` and so on) rather than Tailwind's defaults. Ours don't set a line height, so text keeps the design's `normal` line height unless you add a `leading-*` class.
-- Px is used only where it's best practice: borders, focus outlines, the hard offset shadows, the scanlines and GSAP motion distances. These are fine details that should stay crisp, not grow with the text.
+- Px is used only where it's best practice: borders, focus outlines, the hard offset shadows, the scanlines and the intro animation distances. These are fine details that should stay crisp, not grow with the text.
 - Use the `short:` variant to tighten layouts on laptop-width screens that are 800px tall or less.
-- Animation hooks are `data-anim="intro" | "window"` attributes, kept separate from styling classes. Inside the scene SVG, GSAP targets the `vw-*` class names and `data-vw-layer` attributes.
+- The only animation is a short CSS intro on elements with `data-anim="window"` or `data-anim="intro"` (see `global.css`). The background scene is static.
 
 ## Notes
 
-- The animation respects `prefers-reduced-motion`. Visitors who turn motion off see a still scene.
-- If JavaScript or GSAP fails to load, the page still shows in full. Only the motion is lost.
+- The intro animation is skipped for visitors who turn on reduced motion.
+- If JavaScript fails to load, every page except the quizzes still works in full.
 - Astro ships no JavaScript of its own. Every page runs `main.ts`; quiz pages add their own game script.

@@ -28,23 +28,16 @@ const screen = page === 'home';
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <!--
-      Hide the elements the intro animates until src/scripts/main.ts has set their starting positions.
-      Without this, they paint in place for a moment, vanish, then fade in. Skipped with reduced motion
-      (no intro) and without JavaScript; the timeout shows everything if the script never runs.
-    -->
-    <script is:inline>
-      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        document.documentElement.classList.add('anim-pending');
-        setTimeout(() => document.documentElement.classList.remove('anim-pending'), 3000);
-      }
-    </script>
   </head>
   <body>
-    <div
-      data-vw-root
-      class:list={['relative w-full font-sans text-ink', screen ? 'overflow-x-clip bg-page' : 'min-h-screen']}
+    {/* Hidden until focused: lets keyboard users jump past the header. Every page's <main> has id="main". */}
+    <a
+      href="#main"
+      class="sr-only z-10 border-2 border-ink bg-paper px-4 py-2 font-terminal text-label tracking-label text-ink focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-violet"
     >
+      Skip to content
+    </a>
+    <div class:list={['relative w-full font-sans text-ink', screen ? 'overflow-x-clip bg-page' : 'min-h-screen']}>
       <Backdrop fixed={!screen} />
       <div
         class:list={[

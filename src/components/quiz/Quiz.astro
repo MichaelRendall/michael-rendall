@@ -41,7 +41,13 @@ const flags = Object.fromEntries(
 const label = 'font-terminal text-label tracking-label';
 ---
 
-<Window as="main" title={windowTitle} aria-labelledby="quiz-title" class="mx-auto w-full max-w-136 shadow-hard-8">
+<Window
+  as="main"
+  id="main"
+  title={windowTitle}
+  aria-labelledby="quiz-title"
+  class="mx-auto w-full max-w-136 shadow-hard-8"
+>
   <div data-quiz data-flags={JSON.stringify(flags)} class="flex flex-col gap-4 p-[clamp(1.25rem,2.5vw,1.75rem)]">
     <h1
       id="quiz-title"
@@ -72,7 +78,7 @@ const label = 'font-terminal text-label tracking-label';
     </section>
 
     <section data-screen="play" hidden class="flex flex-col gap-3">
-      <!-- Give up sits with the game status, away from the answer controls, so it's hard to hit by mistake. -->
+      {/* Give up sits with the game status, away from the answer controls, so it's hard to hit by mistake. */}
       <div class="flex items-center justify-between gap-4">
         <p class={label}>
           {quiz.progressLabel} <span data-round>1</span> of <span data-total>{defaults.length}</span>
@@ -88,8 +94,10 @@ const label = 'font-terminal text-label tracking-label';
         class="mx-auto aspect-4/3 w-full max-w-72 border-2 border-ink bg-paper object-cover shadow-hard-4 shadow-lilac"
       />
       <p id="quiz-question" data-question class="text-body-lg font-semibold"></p>
+      {/* Screen readers only: says which question is next when the quiz moves on by itself. */}
+      <p data-announce aria-live="polite" class="sr-only"></p>
 
-      <!-- Type mode: a text box. Choice mode: four option buttons. The engine shows the one the quiz uses. -->
+      {/* Type mode: a text box. Choice mode: four option buttons. The engine shows the one the quiz uses. */}
       <input
         data-guess
         hidden
@@ -100,9 +108,18 @@ const label = 'font-terminal text-label tracking-label';
         spellcheck="false"
         class="min-h-12 w-full border-2 border-ink bg-white px-3 text-body text-ink focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-violet disabled:bg-blush read-only:bg-blush"
       />
-      <div data-choices hidden role="group" aria-labelledby="quiz-question" class="grid gap-2.5 sm:grid-cols-2"></div>
+      {/* tabindex="-1": the engine focuses the group, not the first option, so no option shows a focus ring
+        until the player presses Tab. Focus in the group is what turns on the 1 to 4 keys. */}
+      <div
+        data-choices
+        hidden
+        role="group"
+        tabindex="-1"
+        aria-labelledby="quiz-question"
+        class="grid gap-2.5 focus:outline-none sm:grid-cols-2"
+      ></div>
 
-      <!-- Feedback on the left, the buttons that move on to the right, so "Not quite" and "Next" read together. -->
+      {/* Feedback on the left, the buttons that move on to the right, so "Not quite" and "Next" read together. */}
       <div class="mt-1 flex min-h-12 flex-wrap items-center justify-end gap-2.5">
         <p data-feedback role="status" class="mr-auto text-body font-semibold"></p>
         <div data-type-nav hidden class="flex gap-2.5">

@@ -58,6 +58,7 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
   const scoreEl = $('[data-score]');
   const flagImg = $<HTMLImageElement>('[data-flag]');
   const questionEl = $('[data-question]');
+  const announceEl = $('[data-announce]');
   const input = $<HTMLInputElement>('[data-guess]');
   const typeNav = $('[data-type-nav]');
   const prevBtn = $<HTMLButtonElement>('[data-prev]');
@@ -177,6 +178,12 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
     flagImg.alt = quiz.flagAlt(country);
     questionEl.textContent = quiz.question(country);
     setFeedback('');
+    // Type mode keeps focus in the text box, so nothing else tells a screen reader the question changed.
+    // In choice mode, focus moves to the new options, which are labelled by the question.
+    announceEl.textContent =
+      settings.mode === 'type'
+        ? `${quiz.progressLabel} ${index + 1} of ${round.length}. ${quiz.question(country)}`
+        : '';
 
     if (settings.mode === 'type') {
       input.value = '';
@@ -191,7 +198,8 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
       continueBtn.hidden = true;
       renderChoices(country);
       preload(round[index + 1]);
-      choicesEl.querySelector('button')?.focus();
+      // Focus the group rather than the first option: a script-moved focus would show the option's ring.
+      choicesEl.focus();
     }
   }
 
@@ -252,10 +260,14 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
         const text = document.createElement('span');
         text.className = 'grow';
         text.textContent = option;
+        // The visible ✓ or ✗, plus words for screen readers, filled in once the player has picked.
         const mark = document.createElement('span');
         mark.dataset.mark = '';
         mark.setAttribute('aria-hidden', 'true');
-        button.append(key, text, mark);
+        const state = document.createElement('span');
+        state.dataset.stateText = '';
+        state.className = 'sr-only';
+        button.append(key, text, mark, state);
         button.addEventListener('click', () => choose(option));
         return button;
       }),
@@ -270,12 +282,15 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
     for (const button of buttons) {
       button.disabled = true;
       const mark = button.querySelector<HTMLElement>('[data-mark]');
+      const state = button.querySelector<HTMLElement>('[data-state-text]');
       if (button.dataset.option === answer) {
         button.dataset.state = 'right';
         if (mark) mark.textContent = '✓';
+        if (state) state.textContent = option === answer ? ', your answer, correct' : ', correct answer';
       } else if (button.dataset.option === option) {
         button.dataset.state = 'wrong';
         if (mark) mark.textContent = '✗';
+        if (state) state.textContent = ', your answer, wrong';
       }
     }
 
@@ -402,9 +417,9 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
   });
   prevBtn.addEventListener('click', () => move(-1));
   nextBtn.addEventListener('click', () => move(1));
-  // Choice mode: number keys 1 to 4 pick an option.
-  document.addEventListener('keydown', (event) => {
-    if (settings.mode !== 'choice' || screens.play.hidden || settingsDialog.open) return;
+  // Choice mode: number keys 1 to 4 pick an option, but only while focus is on the options. Page-wide
+  // single-key shortcuts would fail WCAG 2.1.4 (speech input can trigger them by accident).
+  choicesEl.addEventListener('keydown', (event) => {
     if (event.ctrlKey || event.metaKey || event.altKey) return;
     const index = Number(event.key) - 1;
     const button = choicesEl.querySelectorAll<HTMLButtonElement>('button')[index];

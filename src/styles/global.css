@@ -20,8 +20,8 @@
   /* Ink */
   --color-ink: #2a1347; /* text and borders */
   --color-ink-soft: #3a2560; /* body copy */
-  --color-accent: #11807b; /* eyebrow text */
-  --color-violet: #8a4fe0; /* focus ring */
+  --color-accent: #0e7570; /* eyebrow and "correct" text: 4.5:1 or more on every light surface */
+  --color-violet: #6a2fc4; /* focus ring: 3:1 or more against every pastel, as WCAG 1.4.11 needs */
   --color-wrong: #b3245f; /* wrong answers */
 
   /* Surfaces */
@@ -91,9 +91,32 @@
   }
 }
 
-/* Set in BaseLayout's <head> until the intro animation is ready (see src/scripts/main.ts). */
-.anim-pending :is([data-anim='window'], [data-anim='intro']) {
-  visibility: hidden;
+/*
+ * Intro: the window and page furniture settle in once, in CSS, so nothing waits for JavaScript.
+ * The background stays still. Skipped entirely for visitors who ask for reduced motion.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  [data-anim='window'] {
+    animation: settle 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  [data-anim='intro'] {
+    animation: settle-small 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+  }
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+    translate: 0 28px;
+  }
+}
+
+@keyframes settle-small {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
 }
 
 /* Pink-to-teal gradient lettering for page titles. */

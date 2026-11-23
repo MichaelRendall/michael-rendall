@@ -39,7 +39,6 @@
     "@tailwindcss/vite": "^4.3.5",
     "astro": "^7.4.13",
     "flag-icons": "^7.6.0",
-    "gsap": "^3.15.1",
     "tailwindcss": "^4.3.5"
   },
   "overrides": {
