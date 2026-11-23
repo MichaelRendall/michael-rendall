@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Quiz from '../../components/quiz/Quiz.astro';
+import { capitals } from '../../data/capitals';
+import { countries } from '../../data/countries';
+import { capitalsQuiz } from '../../scripts/quiz/capitals';
+
+// Fail the build, not a game, if the capitals data falls out of step with the country list.
+for (const { code, name } of countries) {
+  const info = capitals[code];
+  if (!info) throw new Error(`No capital for ${name} (${code})`);
+  const notWrong = [info.capital, ...(info.also ?? [])];
+  const clash = info.cities.find((city) => notWrong.includes(city));
+  if (clash) throw new Error(`${name}: "${clash}" is a capital, so it can't be a wrong option`);
+  if (new Set(info.cities).size !== info.cities.length) throw new Error(`${name}: duplicate city`);
+}
+---
+
+<BaseLayout page="quizzes" title="Capitals, Michael Rendall" description="Pick the capital city of each country.">
+  <Quiz quiz={capitalsQuiz} heading="Capitals" windowTitle="capitals.exe" />
+</BaseLayout>
+
+<script>
+  import { initQuiz } from '../../scripts/quiz/engine';
+  import { capitalsQuiz } from '../../scripts/quiz/capitals';
+
+  const root = document.querySelector<HTMLElement>('[data-quiz]');
+  if (root) initQuiz(root, capitalsQuiz);
+</script>

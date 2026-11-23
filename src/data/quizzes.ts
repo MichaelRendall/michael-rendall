@@ -27,10 +27,11 @@ export const quizzes: Quiz[] = [
   },
   {
     file: 'capitals.exe',
-    name: 'Capital cities',
-    summary: 'Name the capital of each country.',
+    name: 'Capitals',
+    summary: 'Pick the capital of each country from four of its cities.',
     icon: 'pin',
     previewColours: ['#c9f5f1', '#ffc6e6'],
     shadow: 'pink',
+    href: '/quizzes/capitals',
   },
 ];

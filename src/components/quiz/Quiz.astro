@@ -1,0 +1,143 @@
+---
+// The window, screens and controls shared by every quiz. The page passes its QuizDefinition
+// and runs src/scripts/quiz/engine.ts with the same definition.
+import Button from '../Button.astro';
+import TextButton from '../TextButton.astro';
+import Window from '../Window.astro';
+import QuizSettings from './QuizSettings.astro';
+import { countries } from '../../data/countries';
+import { MODE_LABELS, type QuizDefinition } from '../../scripts/quiz/definition';
+import { defaultSettings } from '../../scripts/quiz/settings';
+
+interface Props {
+  quiz: QuizDefinition;
+  /** The page heading, e.g. "Flags". */
+  heading: string;
+  /** The window's title bar, e.g. "flags.exe". */
+  windowTitle: string;
+}
+
+const { quiz, heading, windowTitle } = Astro.props;
+const defaults = defaultSettings(quiz.modes);
+// Rendered at build time, matching what the engine shows for the default settings.
+const summary =
+  `${defaults.length} ${quiz.unit} from all continents` +
+  (quiz.modes.length > 1 ? ` · ${MODE_LABELS[defaults.mode]}` : '');
+
+// Flag SVGs from the flag-icons package, emitted as hashed files. Only the quiz countries' URLs reach the page.
+const flagFiles = import.meta.glob<string>('/node_modules/flag-icons/flags/4x3/*.svg', {
+  query: '?url',
+  import: 'default',
+  eager: true,
+});
+const flags = Object.fromEntries(
+  countries.map(({ code }) => {
+    const url = flagFiles[`/node_modules/flag-icons/flags/4x3/${code}.svg`];
+    if (!url) throw new Error(`No flag file for "${code}"`);
+    return [code, url];
+  }),
+);
+
+const label = 'font-terminal text-label tracking-label';
+---
+
+<Window as="main" title={windowTitle} aria-labelledby="quiz-title" class="mx-auto w-full max-w-136 shadow-hard-8">
+  <div data-quiz data-flags={JSON.stringify(flags)} class="flex flex-col gap-4 p-[clamp(1.25rem,2.5vw,1.75rem)]">
+    <h1
+      id="quiz-title"
+      class="text-chrome font-pixel text-[clamp(1.75rem,1.25rem+1.5vw,2.5rem)] leading-[1.08] font-bold"
+    >
+      {heading}
+    </h1>
+
+    <section data-screen="start" class="flex flex-col items-start gap-3">
+      <p data-intro class="text-body leading-[1.6] text-ink-soft">
+        {quiz.intro[defaults.mode]}
+      </p>
+      <p data-summary class={label}>
+        {summary}
+      </p>
+      <p data-best hidden class={label}></p>
+      <div class="flex flex-wrap gap-2.5">
+        <Button data-start icon="play">
+          Start quiz
+        </Button>
+        <Button data-open-settings variant="secondary" icon="sliders">
+          Settings
+        </Button>
+      </div>
+      <noscript>
+        <p class="text-body">The quiz needs JavaScript to run.</p>
+      </noscript>
+    </section>
+
+    <section data-screen="play" hidden class="flex flex-col gap-3">
+      <!-- Give up sits with the game status, away from the answer controls, so it's hard to hit by mistake. -->
+      <div class="flex items-center justify-between gap-4">
+        <p class={label}>
+          {quiz.progressLabel} <span data-round>1</span> of <span data-total>{defaults.length}</span>
+          <span aria-hidden="true">·</span> Score <span data-score>0</span>
+        </p>
+        <TextButton data-give-up>Give up</TextButton>
+      </div>
+      <img
+        data-flag
+        alt=""
+        width="640"
+        height="480"
+        class="mx-auto aspect-4/3 w-full max-w-72 border-2 border-ink bg-paper object-cover shadow-hard-4 shadow-lilac"
+      />
+      <p id="quiz-question" data-question class="text-body-lg font-semibold"></p>
+
+      <!-- Type mode: a text box. Choice mode: four option buttons. The engine shows the one the quiz uses. -->
+      <input
+        data-guess
+        hidden
+        type="text"
+        aria-labelledby="quiz-question"
+        autocomplete="off"
+        autocapitalize="words"
+        spellcheck="false"
+        class="min-h-12 w-full border-2 border-ink bg-white px-3 text-body text-ink focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-violet disabled:bg-blush read-only:bg-blush"
+      />
+      <div data-choices hidden role="group" aria-labelledby="quiz-question" class="grid gap-2.5 sm:grid-cols-2"></div>
+
+      <!-- Feedback on the left, the buttons that move on to the right, so "Not quite" and "Next" read together. -->
+      <div class="mt-1 flex min-h-12 flex-wrap items-center justify-end gap-2.5">
+        <p data-feedback role="status" class="mr-auto text-body font-semibold"></p>
+        <div data-type-nav hidden class="flex gap-2.5">
+          <Button data-prev variant="secondary">
+            <span aria-hidden="true">←</span> Previous
+          </Button>
+          <Button data-next variant="secondary">
+            Next <span aria-hidden="true">→</span>
+          </Button>
+        </div>
+        <Button data-continue hidden>
+          Next question
+        </Button>
+      </div>
+    </section>
+
+    <section data-screen="results" hidden class="flex flex-col items-start gap-3">
+      <h2 data-result-title tabindex="-1" class="font-pixel text-label-xl font-bold focus:outline-none">
+        Results
+      </h2>
+      <p data-result-best class={label}></p>
+      <div data-missed-wrap class="flex w-full flex-col gap-2">
+        <h3 class={label}>{quiz.missedHeading}</h3>
+        <ul data-missed class="grid gap-2 sm:grid-cols-2"></ul>
+      </div>
+      <div class="flex flex-wrap gap-2.5">
+        <Button data-again icon="play">
+          Play again
+        </Button>
+        <Button data-open-settings variant="secondary" icon="sliders">
+          Settings
+        </Button>
+      </div>
+    </section>
+
+    <QuizSettings unit={quiz.unit} modes={quiz.modes} summary={summary} />
+  </div>
+</Window>
