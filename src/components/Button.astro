@@ -1,8 +1,10 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
 import Icon, { type IconName } from './Icon.astro';
 
-interface Props {
-  href: string;
+interface Props extends Omit<HTMLAttributes<'button'>, 'class'> {
+  /** Renders a link. Without it, renders a <button> (type="button" unless set). */
+  href?: string;
   /** nav: pixel-font header link. primary: pink. secondary: mint. */
   variant?: 'nav' | 'primary' | 'secondary';
   size?: 'md' | 'lg';
@@ -11,7 +13,7 @@ interface Props {
   current?: boolean;
 }
 
-const { href, variant = 'primary', size = 'md', icon, current = false } = Astro.props;
+const { href, variant = 'primary', size = 'md', icon, current = false, type = 'button', ...attrs } = Astro.props;
 
 const looks = {
   nav: ['font-terminal text-label-lg tracking-label', current ? 'bg-mint-light shadow-pink' : 'bg-paper'],
@@ -19,21 +21,27 @@ const looks = {
   secondary: ['bg-mint-pale shadow-pink font-semibold', size === 'lg' ? 'text-body' : 'text-body-sm'],
 };
 const iconSize = variant !== 'nav' && size === 'md' ? 'sm' : 'md';
+const classes = [
+  'inline-flex cursor-pointer items-center border-2 border-ink text-ink shadow-hard-3',
+  // Hover: mint fill, deeper pink shadow and a small lift. With reduced motion, the colours still change but nothing moves.
+  'transition-[background-color,box-shadow,translate] duration-150 hover:-translate-0.5 hover:bg-mint-light hover:shadow-hard-5 hover:shadow-pink',
+  'motion-reduce:transition-none motion-reduce:hover:translate-none',
+  'focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-violet',
+  // Disabled: faded and no hover lift.
+  'disabled:pointer-events-none disabled:opacity-50',
+  size === 'lg' ? 'min-h-13 gap-2.5 px-5' : 'min-h-12 gap-2 px-4',
+  looks[variant],
+];
 ---
 
-<a
-  href={href}
-  aria-current={current ? 'page' : undefined}
-  class:list={[
-    'inline-flex items-center border-2 border-ink text-ink shadow-hard-3',
-    // Hover: mint fill, deeper pink shadow and a small lift. With reduced motion, the colours still change but nothing moves.
-    'transition-[background-color,box-shadow,translate] duration-150 hover:-translate-0.5 hover:bg-mint-light hover:shadow-hard-5 hover:shadow-pink',
-    'motion-reduce:transition-none motion-reduce:hover:translate-none',
-    'focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-violet',
-    size === 'lg' ? 'min-h-13 gap-2.5 px-5' : 'min-h-12 gap-2 px-4',
-    looks[variant],
-  ]}
->
-  {icon && <Icon name={icon} size={iconSize} />}
-  <slot />
-</a>
+{href ? (
+  <a href={href} aria-current={current ? 'page' : undefined} class:list={classes}>
+    {icon && <Icon name={icon} size={iconSize} />}
+    <slot />
+  </a>
+) : (
+  <button type={type} class:list={classes} {...attrs}>
+    {icon && <Icon name={icon} size={iconSize} />}
+    <slot />
+  </button>
+)}

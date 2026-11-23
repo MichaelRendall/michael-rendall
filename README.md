@@ -13,7 +13,7 @@ src/
   data/           projects.ts: the content for the projects page
   scripts/        main.ts: footer clock (Glasgow time), year, and all GSAP animation
   styles/         global.css: Tailwind, fonts, colour and shadow tokens
-public/           Files copied to the site root unchanged (favicon, robots.txt, images)
+public/           Files copied to the site root unchanged (favicons, robots.txt, images)
 ```
 
 ## Run it
@@ -51,6 +51,7 @@ Vercel builds the site on every push to the connected Git repository. Production
 - **Add or edit a project:** edit `src/data/projects.ts`. The cards and the list are built from it.
 - **Add a page:** create `src/pages/<name>.astro` and wrap it in `<BaseLayout>`. It builds to `/<name>.html`. Add a link in `SiteHeader.astro`, and add the page to `BaseLayout`'s `page` prop type.
 - **Change colours or fonts:** edit the `@theme` block in `src/styles/global.css`. Every `bg-*`, `text-*`, `border-*` and `shadow-*` class picks up the change.
+- **Change the favicon:** edit `public/favicon.svg`. Modern browsers use it directly. `favicon.ico` (for older browsers) and `apple-touch-icon.png` (for iOS home screens) are PNG renders of it, so export new copies at 32px and 180px when the SVG changes.
 - **Swap a font:** install it from [Fontsource](https://fontsource.org) (`npm install @fontsource/<font-name>`), replace its `@import` in `global.css`, and update `--font-pixel`, `--font-terminal` or `--font-sans`.
 
 ## Styling conventions
@@ -65,8 +66,6 @@ Vercel builds the site on every push to the connected Git repository. Production
 ## Before you publish
 
 - Replace the text in square brackets: [WHAT YOU BUILD], [PROJECT NAME], [TECH], [YEAR] and [SCREENSHOT OR GIF].
-- Update the contact links in `src/pages/index.astro`. They currently point to hello@example.com, github.com and linkedin.com.
-- Add a favicon to `public/`.
 
 ## Notes
 

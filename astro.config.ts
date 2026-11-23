@@ -12,8 +12,10 @@ export default defineConfig({
     plugins: [tailwindcss()],
     build: {
       // Never inline fonts as data URIs: inlined subsets are downloaded by every visitor,
-      // which defeats unicode-range. Other small assets use Vite's default 4 kB limit.
-      assetsInlineLimit: (filePath: string) => (/\.woff2?$/.test(filePath) ? false : undefined),
+      // which defeats unicode-range. Flags stay as files too, so the quiz only downloads the ones it shows.
+      // Other small assets use Vite's default 4 kB limit.
+      assetsInlineLimit: (filePath: string) =>
+        /\.woff2?$/.test(filePath) || filePath.includes('flag-icons') ? false : undefined,
     },
   },
 });

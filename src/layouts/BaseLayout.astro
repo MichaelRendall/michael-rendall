@@ -7,7 +7,7 @@ import SiteFooter from '../components/SiteFooter.astro';
 interface Props {
   title: string;
   description: string;
-  page: 'home' | 'projects';
+  page: 'home' | 'projects' | 'flag-quiz';
 }
 
 const { title, description, page } = Astro.props;
@@ -24,6 +24,20 @@ const screen = page === 'home';
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!--
+      Hide the elements the intro animates until src/scripts/main.ts has set their starting positions.
+      Without this, they paint in place for a moment, vanish, then fade in. Skipped with reduced motion
+      (no intro) and without JavaScript; the timeout shows everything if the script never runs.
+    -->
+    <script is:inline>
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('anim-pending');
+        setTimeout(() => document.documentElement.classList.remove('anim-pending'), 3000);
+      }
+    </script>
   </head>
   <body>
     <div

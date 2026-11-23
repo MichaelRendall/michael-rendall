@@ -2,7 +2,7 @@
 import Scene from './Scene.astro';
 
 interface Props {
-  /** Fixed behind scrolling content, with a pale wash so text stays readable. */
+  /** Fixed behind scrolling content, so the scene stays put while the page scrolls. */
   fixed?: boolean;
 }
 
@@ -18,6 +18,5 @@ const { fixed = false } = Astro.props;
     </filter>
     <rect width="100%" height="100%" filter="url(#vwGrain)"></rect>
   </svg>
-  {fixed && <div class="absolute inset-0 bg-[rgb(255_240_248/0.28)]"></div>}
   <div class="absolute inset-0 bg-scanlines"></div>
 </div>

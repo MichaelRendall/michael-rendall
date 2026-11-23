@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+  <defs>
+    <linearGradient id="bar" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#ff8fcf"/>
+      <stop offset="0.5" stop-color="#c3a6ff"/>
+      <stop offset="1" stop-color="#8fe9f0"/>
+    </linearGradient>
+    <linearGradient id="chrome" x1="0" x2="1" y1="0" y2="0.3">
+      <stop offset="0" stop-color="#d0358f"/>
+      <stop offset="0.5" stop-color="#8a4fe0"/>
+      <stop offset="1" stop-color="#12908a"/>
+    </linearGradient>
+  </defs>
+  <!-- Mint offset shadow -->
+  <rect x="4" y="4" width="28" height="28" fill="#7ff6ea"/>
+  <!-- Window: ink border, paper body, gradient title bar -->
+  <rect width="28" height="28" fill="#2a1347"/>
+  <rect x="2" y="2" width="24" height="24" fill="#fff4fa"/>
+  <rect x="2" y="2" width="24" height="6" fill="url(#bar)"/>
+  <rect x="2" y="8" width="24" height="2" fill="#2a1347"/>
+  <!-- Pixel "M" -->
+  <path fill="url(#chrome)" d="M7 12h4v12H7zM17 12h4v12h-4zM11 14h2v2h-2zM15 14h2v2h-2zM13 16h2v2h-2z"/>
+</svg>

@@ -7,7 +7,9 @@ interface Props {
 }
 
 const { pinBottom = false } = Astro.props;
-const chip = 'border-2 border-ink bg-paper px-3 py-1 font-terminal text-label tracking-label shadow-hard-4';
+// Plain information, so no border or offset shadow: those are reserved for things you can click.
+// The translucent backing keeps the text readable over the scene.
+const chip = 'bg-paper/75 px-3 py-1 font-terminal text-label tracking-label';
 ---
 
 <footer data-anim="intro" class:list={['flex flex-wrap justify-between gap-3', pinBottom && 'mt-auto']}>
