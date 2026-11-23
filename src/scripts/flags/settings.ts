@@ -1,4 +1,4 @@
-// Flag quiz settings: how many flags per game, and which continents they come from.
+// Flags quiz settings: how many flags per game, and which continents they come from.
 import { continents, countries, type Continent, type Country } from '../../data/countries';
 
 /** Game lengths on offer. "all" plays every country that matches the continent filter. */
@@ -12,7 +12,7 @@ export interface Settings {
 
 export const DEFAULT_SETTINGS: Settings = { length: 10, continents: [...continents] };
 
-const SETTINGS_KEY = 'flag-quiz:settings';
+const SETTINGS_KEY = 'flags:settings';
 
 /** The countries a game can draw from. */
 export const poolFor = (settings: Settings): Country[] =>
@@ -49,7 +49,7 @@ export function saveSettings(settings: Settings): void {
  * on Europe isn't comparable with 8 out of 10 on the whole world.
  */
 const bestKey = (settings: Settings): string =>
-  `flag-quiz:best:${totalFor(settings)}:${[...settings.continents].sort().join(',')}`;
+  `flags:best:${totalFor(settings)}:${[...settings.continents].sort().join(',')}`;
 
 export function readBest(settings: Settings): number | null {
   try {

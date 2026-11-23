@@ -2,7 +2,7 @@
 import Button from './Button.astro';
 
 interface Props {
-  current: 'home' | 'projects' | 'flag-quiz';
+  current: 'home' | 'quizzes';
 }
 
 const { current } = Astro.props;
@@ -13,11 +13,8 @@ const { current } = Astro.props;
     <Button href="/" variant="nav" icon="home" current={current === 'home'}>
       Home
     </Button>
-    <Button href="/projects.html" variant="nav" icon="folder" current={current === 'projects'}>
-      Projects
-    </Button>
-    <Button href="/flag-quiz" variant="nav" icon="flag" current={current === 'flag-quiz'}>
-      Flag quiz
+    <Button href="/quizzes" variant="nav" icon="puzzle" current={current === 'quizzes'}>
+      Quizzes
     </Button>
   </nav>
 </header>

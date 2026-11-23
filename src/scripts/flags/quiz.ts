@@ -1,8 +1,8 @@
-// Flag quiz: show a flag, the player types the country. Guesses are unlimited and the player can move between
+// Flags quiz: show a flag, the player types the country. Guesses are unlimited and the player can move between
 // the flags they haven't named yet. The game ends when every flag is named or the player gives up.
-// See src/pages/flag-quiz.astro for the markup.
-import { continents, countries, type Country } from '../../data/countries';
-import { check, type Verdict } from './match';
+// See src/pages/quizzes/flags.astro for the markup.
+import { continents, type Country } from '../../data/countries';
+import { isCorrect } from './match';
 import {
   DEFAULT_SETTINGS,
   LENGTHS,
@@ -33,7 +33,7 @@ function pick<T>(items: T[], count: number): T[] {
 export function initQuiz(root: HTMLElement): void {
   const $ = <T extends HTMLElement>(sel: string): T => {
     const el = root.querySelector<T>(sel);
-    if (!el) throw new Error(`Flag quiz: missing ${sel}`);
+    if (!el) throw new Error(`Flags quiz: missing ${sel}`);
     return el;
   };
 
@@ -53,7 +53,6 @@ export function initQuiz(root: HTMLElement): void {
   const totalEl = $('[data-total]');
   const scoreEl = $('[data-score]');
   const flagImg = $<HTMLImageElement>('[data-flag]');
-  const form = $<HTMLFormElement>('[data-form]');
   const input = $<HTMLInputElement>('[data-guess]');
   const prevBtn = $<HTMLButtonElement>('[data-prev]');
   const nextBtn = $<HTMLButtonElement>('[data-next]');
@@ -175,14 +174,10 @@ export function initQuiz(root: HTMLElement): void {
     feedback.classList.toggle('text-wrong', tone === 'wrong');
   }
 
-  function accept(verdict: Exclude<Verdict, 'wrong'>): void {
-    const country = round[current];
+  function accept(): void {
     solved.add(current);
     scoreEl.textContent = String(solved.size);
-    setFeedback(
-      verdict === 'correct' ? `✓ Correct! It's ${country.name}.` : `✓ Close enough! It's spelled ${country.name}.`,
-      'right',
-    );
+    setFeedback(`✓ Correct! It's ${round[current].name}.`, 'right');
     // Read-only rather than disabled keeps focus in the box, so the phone keyboard stays open for the next flag.
     input.readOnly = true;
     const done = solved.size === round.length;
@@ -276,25 +271,10 @@ export function initQuiz(root: HTMLElement): void {
     applySettings();
     updateSummary();
   });
-  form.addEventListener('submit', (event) => {
-    event.preventDefault();
-    if (input.readOnly) return;
-    const guess = input.value.trim();
-    if (!guess) {
-      setFeedback('Type a country name, or press Next.');
-      input.focus();
-      return;
-    }
-    // Checked against every country, not just the pool, so a near miss on an excluded country still isn't "close".
-    const verdict = check(guess, round[current], countries);
-    if (verdict !== 'wrong') return accept(verdict);
-    setFeedback('✗ Not quite. Try again, or move on with Next.', 'wrong');
-    input.select();
-  });
-  // Accept an exact match as soon as it's typed. Typos still need Enter, so a half-typed name never counts.
+  // A right answer is accepted the moment it's typed, so there's nothing to submit.
   input.addEventListener('input', () => {
     const country = round[current];
-    if (country && !input.readOnly && check(input.value, country, countries) === 'correct') accept('correct');
+    if (country && !input.readOnly && isCorrect(input.value, country)) accept();
   });
   prevBtn.addEventListener('click', () => move(-1));
   nextBtn.addEventListener('click', () => move(1));

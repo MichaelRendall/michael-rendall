@@ -5,7 +5,7 @@ export default defineConfig({
   // Hide the dev toolbar Astro overlays on pages during `npm run dev`. It never appears in production builds.
   devToolbar: { enabled: false },
   build: {
-    // Output projects.html rather than projects/index.html, so existing links keep working.
+    // Output quizzes.html rather than quizzes/index.html. Vercel's cleanUrls serves it at /quizzes.
     format: 'file',
   },
   vite: {

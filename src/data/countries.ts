@@ -1,7 +1,7 @@
 // The 193 UN member states, plus Vatican City and Kosovo. `code` is the ISO 3166-1 alpha-2 code (Kosovo uses
 // the widely adopted "xk"), which is also the flag's file name in flag-icons.
 // `aliases` are other names a player might reasonably type. Accents, capitals, punctuation, "the" and
-// "Saint"/"St" don't matter (see src/scripts/flag-quiz/match.ts), so there's no need to list those variations.
+// "Saint"/"St" don't matter (see src/scripts/flags/match.ts), so there's no need to list those variations.
 
 export const continents = ['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'] as const;
 export type Continent = (typeof continents)[number];

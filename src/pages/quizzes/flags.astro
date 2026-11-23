@@ -1,10 +1,10 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Button from '../components/Button.astro';
-import TitleBar from '../components/TitleBar.astro';
-import Window from '../components/Window.astro';
-import { continents, countries } from '../data/countries';
-import { DEFAULT_SETTINGS, LENGTHS } from '../scripts/flag-quiz/settings';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Button from '../../components/Button.astro';
+import TitleBar from '../../components/TitleBar.astro';
+import Window from '../../components/Window.astro';
+import { continents, countries } from '../../data/countries';
+import { DEFAULT_SETTINGS, LENGTHS } from '../../scripts/flags/settings';
 
 // Flag SVGs from the flag-icons package, emitted as hashed files. Only the quiz countries' URLs reach the page.
 const flagFiles = import.meta.glob<string>('/node_modules/flag-icons/flags/4x3/*.svg', {
@@ -39,21 +39,20 @@ const textButton = [
 ];
 ---
 
-<BaseLayout page="flag-quiz" title="Flag quiz, Michael Rendall" description="Name the country from its flag.">
-  <Window as="main" title="flag_quiz.exe" aria-labelledby="quiz-title" class="mx-auto w-full max-w-136 shadow-hard-8">
+<BaseLayout page="quizzes" title="Flags, Michael Rendall" description="Name the country from its flag.">
+  <Window as="main" title="flags.exe" aria-labelledby="quiz-title" class="mx-auto w-full max-w-136 shadow-hard-8">
     <div data-quiz data-flags={JSON.stringify(flags)} class="flex flex-col gap-4 p-[clamp(1.25rem,2.5vw,1.75rem)]">
       <h1
         id="quiz-title"
         class="text-chrome font-pixel text-[clamp(1.75rem,1.25rem+1.5vw,2.5rem)] leading-[1.08] font-bold"
       >
-        Flag quiz
+        Flags
       </h1>
 
       <section data-screen="start" class="flex flex-col items-start gap-3">
         <p class="text-body leading-[1.6] text-ink-soft">
-          Name the country for each flag. Type the right name and it's accepted straight away, or press Enter to try a
-          guess (small typos count). Stuck? Move on with Next and come back later. The quiz ends when you've named them
-          all, or when you give up.
+          Name the country for each flag. Type the right name and it's accepted straight away. Stuck? Move on with Next
+          and come back later. The quiz ends when you've named them all, or when you give up.
         </p>
         <p data-summary class={label}>
           {DEFAULT_SETTINGS.length} flags from all continents
@@ -88,7 +87,7 @@ const textButton = [
           height="480"
           class="mx-auto aspect-4/3 w-full max-w-72 border-2 border-ink bg-paper object-cover shadow-hard-4 shadow-lilac"
         />
-        <form data-form class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2">
           <label for="guess" class={label}>
             Which country is this?
           </label>
@@ -112,7 +111,7 @@ const textButton = [
             </div>
             <Button data-give-up>Give up</Button>
           </div>
-        </form>
+        </div>
         <p data-feedback role="status" class="min-h-[1.5em] text-body font-semibold"></p>
       </section>
 
@@ -209,7 +208,7 @@ const textButton = [
 </BaseLayout>
 
 <script>
-  import { initQuiz } from '../scripts/flag-quiz/quiz';
+  import { initQuiz } from '../../scripts/flags/quiz';
 
   const root = document.querySelector<HTMLElement>('[data-quiz]');
   if (root) initQuiz(root);
