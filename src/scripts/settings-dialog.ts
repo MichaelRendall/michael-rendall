@@ -1,0 +1,76 @@
+// Client side of the shared settings pop-up (src/components/settings/). Opens and closes it, runs
+// Select all and Clear, and enforces "at least one continent". Each game supplies what a change means.
+
+export const checkedValues = (form: HTMLFormElement, name: string): string[] =>
+  Array.from(form.querySelectorAll<HTMLInputElement>(`input[name="${name}"]`))
+    .filter((el) => el.checked)
+    .map((el) => el.value);
+
+export function setChecked(form: HTMLFormElement, name: string, values: readonly string[]): void {
+  form.querySelectorAll<HTMLInputElement>(`input[name="${name}"]`).forEach((el) => {
+    el.checked = values.includes(el.value);
+  });
+}
+
+interface Hooks {
+  /** The form changed: read it, save it if valid, update the page. */
+  onChange(): void;
+  /** Closed with no continent picked: put the last saved settings back in the form. */
+  onRevert(): void;
+}
+
+/** Wires up the pop-up inside `root`. Returns `refresh`, to call after setting the form from code. */
+export function wireSettingsDialog(root: HTMLElement, hooks: Hooks): { refresh(): void } {
+  const $ = <T extends HTMLElement>(sel: string): T => {
+    const el = root.querySelector<T>(sel);
+    if (!el) throw new Error(`Settings: missing ${sel}`);
+    return el;
+  };
+  const dialog = $<HTMLDialogElement>('[data-settings-dialog]');
+  const form = $<HTMLFormElement>('[data-settings]');
+  const selectAllBtn = $<HTMLButtonElement>('[data-select-all]');
+  const clearBtn = $<HTMLButtonElement>('[data-clear]');
+  const continentInputs = form.querySelectorAll<HTMLInputElement>('input[name="continent"]');
+  const picked = (): number => Array.from(continentInputs).filter((el) => el.checked).length;
+
+  function refresh(): void {
+    selectAllBtn.disabled = picked() === continentInputs.length;
+    clearBtn.disabled = picked() === 0;
+  }
+
+  function changed(): void {
+    hooks.onChange();
+    refresh();
+  }
+
+  const setAll = (checked: boolean): void => {
+    continentInputs.forEach((el) => (el.checked = checked));
+    changed();
+    continentInputs[0]?.focus();
+  };
+
+  root.querySelectorAll('[data-open-settings]').forEach((el) =>
+    el.addEventListener('click', () => {
+      dialog.showModal();
+      form.querySelector<HTMLInputElement>('input:checked')?.focus();
+    }),
+  );
+  form.addEventListener('change', changed);
+  selectAllBtn.addEventListener('click', () => setAll(true));
+  clearBtn.addEventListener('click', () => setAll(false));
+  // "Done" needs a continent picked. Closing any other way (Escape, the × button) goes back to the last saved settings.
+  form.addEventListener('submit', (event) => {
+    if (picked()) return;
+    event.preventDefault();
+    continentInputs[0]?.focus();
+  });
+  $('[data-settings-close]').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('close', () => {
+    if (picked()) return;
+    hooks.onRevert();
+    refresh();
+  });
+
+  refresh();
+  return { refresh };
+}

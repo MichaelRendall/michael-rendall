@@ -1,0 +1,41 @@
+---
+// The settings pop-up shell shared by every game: title bar, close button, the fields (default slot),
+// a live summary line and Done. src/scripts/settings-dialog.ts wires it up.
+import Button from '../Button.astro';
+import TitleBar from '../TitleBar.astro';
+
+interface Props {
+  /** The summary line for the default settings, kept up to date by the game's script. */
+  summary: string;
+}
+
+const { summary } = Astro.props;
+---
+
+<dialog
+  data-settings-dialog
+  aria-labelledby="settings-title"
+  class="m-auto max-h-[calc(100dvh-2rem)] w-[min(34rem,calc(100%-2rem))] border-2 border-ink bg-paper text-ink shadow-hard-8 backdrop:bg-ink/40"
+>
+  <TitleBar size="md">
+    <h2 id="settings-title" class="font-terminal text-label-lg font-normal tracking-label">
+      settings.ini
+    </h2>
+    <button
+      slot="end"
+      type="button"
+      data-settings-close
+      aria-label="Close settings"
+      class="grid size-7 cursor-pointer place-items-center border-2 border-ink bg-paper font-terminal text-label-lg leading-none hover:bg-pink-light focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-violet"
+    >
+      ×
+    </button>
+  </TitleBar>
+  <form data-settings method="dialog" class="flex flex-col items-start gap-5 p-[clamp(1.25rem,2.5vw,1.75rem)]">
+    <slot />
+    <p data-summary aria-live="polite" class="font-terminal text-label tracking-label">
+      {summary}
+    </p>
+    <Button type="submit">Done</Button>
+  </form>
+</dialog>

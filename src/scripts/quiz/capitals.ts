@@ -1,5 +1,5 @@
 // Capitals: pick the capital from four cities in the same country.
-import { countries, type Country } from '../../data/countries';
+import { countries, nameInSentence, type Country } from '../../data/countries';
 import { capitals, type CapitalInfo } from '../../data/capitals';
 import { shuffle, type QuizDefinition } from './definition';
 
@@ -41,7 +41,7 @@ export const capitalsQuiz: QuizDefinition = {
       'choose carefully. Use the number keys 1 to 4 if you prefer the keyboard.',
   },
   missedHeading: 'Capitals you missed',
-  question: (country) => `What's the capital of ${country.name}?`,
+  question: (country) => `What's the capital of ${nameInSentence(country)}?`,
   flagAlt: (country) => `Flag of ${country.name}`,
   answer: (country) => infoFor(country).capital,
   options,

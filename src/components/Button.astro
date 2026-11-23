@@ -11,9 +11,20 @@ interface Props extends Omit<HTMLAttributes<'button'>, 'class'> {
   icon?: IconName;
   /** Marks the nav link for the current page. */
   current?: boolean;
+  /** Opens the link in a new tab, and tells screen reader users it will. */
+  newTab?: boolean;
 }
 
-const { href, variant = 'primary', size = 'md', icon, current = false, type = 'button', ...attrs } = Astro.props;
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  icon,
+  current = false,
+  newTab = false,
+  type = 'button',
+  ...attrs
+} = Astro.props;
 
 const looks = {
   nav: ['font-terminal text-label-lg tracking-label', current ? 'bg-mint-light shadow-pink' : 'bg-paper'],
@@ -27,17 +38,24 @@ const classes = [
   'transition-[background-color,box-shadow,translate] duration-150 hover:-translate-0.5 hover:bg-mint-light hover:shadow-hard-5 hover:shadow-pink',
   'motion-reduce:transition-none motion-reduce:hover:translate-none',
   'focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-violet',
-  // Disabled: faded and no hover lift.
-  'disabled:pointer-events-none disabled:opacity-50',
+  // Disabled: faded and no hover lift. aria-disabled is for buttons that must keep focus while inactive.
+  'disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50',
   size === 'lg' ? 'min-h-13 gap-2.5 px-5' : 'min-h-12 gap-2 px-4',
   looks[variant],
 ];
 ---
 
 {href ? (
-  <a href={href} aria-current={current ? 'page' : undefined} class:list={classes}>
+  <a
+    href={href}
+    aria-current={current ? 'page' : undefined}
+    target={newTab ? '_blank' : undefined}
+    rel={newTab ? 'noopener noreferrer' : undefined}
+    class:list={classes}
+  >
     {icon && <Icon name={icon} size={iconSize} />}
     <slot />
+    {newTab && <span class="sr-only"> (opens in a new tab)</span>}
   </a>
 ) : (
   <button type={type} class:list={classes} {...attrs}>

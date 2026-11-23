@@ -224,3 +224,10 @@ export const countries: Country[] = [
   { code: 'zm', continent: 'Africa', name: 'Zambia' },
   { code: 'zw', continent: 'Africa', name: 'Zimbabwe' },
 ];
+
+// Names that read with "the" in a sentence: "the capital of the United Kingdom", "Is the Netherlands bigger…".
+const WITH_THE = new Set(['bs', 'cd', 'cf', 'do', 'gb', 'gm', 'km', 'mh', 'mv', 'nl', 'ph', 'sb', 'sc', 'ae', 'us']);
+
+/** The country's name as it reads mid-sentence, with "the" where English uses it. */
+export const nameInSentence = (country: Country): string =>
+  WITH_THE.has(country.code) ? `the ${country.name}` : country.name;

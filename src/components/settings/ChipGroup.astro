@@ -1,0 +1,45 @@
+---
+// A labelled group of settings chips: each is a visually hidden radio or checkbox inside a clickable
+// label. The tick marks selected chips without relying on colour alone. Extra controls go in the slot.
+interface Option {
+  value: string;
+  label: string;
+  /** Shown after the label in a softer colour, e.g. a count. */
+  note?: string;
+}
+
+interface Props {
+  legend: string;
+  name: string;
+  type: 'radio' | 'checkbox';
+  options: Option[];
+  /** Values checked by default. */
+  checked: string[];
+}
+
+const { legend, name, type, options, checked } = Astro.props;
+---
+
+<fieldset class="flex flex-col gap-1.5">
+  <legend class="mb-1.5 font-terminal text-label tracking-label">{legend}</legend>
+  <div class="flex flex-wrap gap-2">
+    {options.map((option) => (
+      <label
+        class:list={[
+          'group inline-flex min-h-10 cursor-pointer items-center gap-1.5 border-2 border-ink bg-paper px-3',
+          'font-terminal text-label tracking-label text-ink hover:bg-mint-mist',
+          'has-checked:bg-mint-light has-checked:shadow-hard-3 has-checked:shadow-pink',
+          'has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-violet',
+        ]}
+      >
+        <input type={type} name={name} value={option.value} checked={checked.includes(option.value)} class="sr-only" />
+        <span aria-hidden="true" class="hidden group-has-checked:inline">
+          ✓
+        </span>
+        {option.label}
+        {option.note && <span class="text-ink-soft">({option.note})</span>}
+      </label>
+    ))}
+  </div>
+  <slot />
+</fieldset>

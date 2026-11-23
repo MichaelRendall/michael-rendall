@@ -4,11 +4,7 @@ import Button from '../components/Button.astro';
 import Window from '../components/Window.astro';
 ---
 
-<BaseLayout
-  page="home"
-  title="Michael Rendall, frontend developer"
-  description="Michael Rendall is a frontend developer based in Glasgow."
->
+<BaseLayout page="home" title="Michael Rendall" description="Games, quizzes and tools Michael Rendall builds for fun.">
   <Window
     as="main"
     id="main"
@@ -16,9 +12,6 @@ import Window from '../components/Window.astro';
     class="w-full max-w-151 shadow-[10px_10px_0_var(--color-mint),10px_10px_0_2px_var(--color-ink)]"
   >
     <div class="flex flex-col gap-4 p-[clamp(1.625rem,3vw,2.5rem)] short:gap-3 short:p-7">
-      <p data-anim="intro" class="font-terminal text-label-xl tracking-label-wide text-accent">
-        ✦ FRONTEND DEVELOPER ✦
-      </p>
       <h1
         data-anim="intro"
         class="text-chrome font-pixel text-display leading-[1.08] font-bold short:text-display-short"
@@ -32,10 +25,10 @@ import Window from '../components/Window.astro';
         <Button href="mailto:michaelrendallmail@gmail.com" size="lg" icon="mail">
           Email me
         </Button>
-        <Button href="https://github.com/MichaelRendall" size="lg" icon="code">
+        <Button href="https://github.com/MichaelRendall" size="lg" icon="code" newTab>
           GitHub
         </Button>
-        <Button href="https://www.linkedin.com/in/michael-rendall/" size="lg" icon="briefcase">
+        <Button href="https://www.linkedin.com/in/michael-rendall/" size="lg" icon="briefcase" newTab>
           LinkedIn
         </Button>
       </nav>

@@ -5,7 +5,7 @@ import Button from '../Button.astro';
 import TextButton from '../TextButton.astro';
 import Window from '../Window.astro';
 import QuizSettings from './QuizSettings.astro';
-import { countries } from '../../data/countries';
+import { flagUrls } from '../../data/flag-urls';
 import { MODE_LABELS, type QuizDefinition } from '../../scripts/quiz/definition';
 import { defaultSettings } from '../../scripts/quiz/settings';
 
@@ -24,20 +24,6 @@ const summary =
   `${defaults.length} ${quiz.unit} from all continents` +
   (quiz.modes.length > 1 ? ` · ${MODE_LABELS[defaults.mode]}` : '');
 
-// Flag SVGs from the flag-icons package, emitted as hashed files. Only the quiz countries' URLs reach the page.
-const flagFiles = import.meta.glob<string>('/node_modules/flag-icons/flags/4x3/*.svg', {
-  query: '?url',
-  import: 'default',
-  eager: true,
-});
-const flags = Object.fromEntries(
-  countries.map(({ code }) => {
-    const url = flagFiles[`/node_modules/flag-icons/flags/4x3/${code}.svg`];
-    if (!url) throw new Error(`No flag file for "${code}"`);
-    return [code, url];
-  }),
-);
-
 const label = 'font-terminal text-label tracking-label';
 ---
 
@@ -48,7 +34,7 @@ const label = 'font-terminal text-label tracking-label';
   aria-labelledby="quiz-title"
   class="mx-auto w-full max-w-136 shadow-hard-8"
 >
-  <div data-quiz data-flags={JSON.stringify(flags)} class="flex flex-col gap-4 p-[clamp(1.25rem,2.5vw,1.75rem)]">
+  <div data-quiz data-flags={JSON.stringify(flagUrls)} class="flex flex-col gap-4 p-[clamp(1.25rem,2.5vw,1.75rem)]">
     <h1
       id="quiz-title"
       class="text-chrome font-pixel text-[clamp(1.75rem,1.25rem+1.5vw,2.5rem)] leading-[1.08] font-bold"

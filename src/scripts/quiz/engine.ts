@@ -20,6 +20,7 @@ import {
   totalFor,
   type Settings,
 } from './settings';
+import { checkedValues, setChecked, wireSettingsDialog } from '../settings-dialog';
 
 /** How long a right answer stays on screen before the next question, in ms. */
 const ADVANCE_DELAY = 1200;
@@ -46,10 +47,7 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
     play: $('[data-screen="play"]'),
     results: $('[data-screen="results"]'),
   };
-  const settingsDialog = $<HTMLDialogElement>('[data-settings-dialog]');
   const settingsForm = $<HTMLFormElement>('[data-settings]');
-  const selectAllBtn = $<HTMLButtonElement>('[data-select-all]');
-  const clearBtn = $<HTMLButtonElement>('[data-clear]');
   const summaryEls = root.querySelectorAll<HTMLElement>('[data-summary]');
   const introEl = $('[data-intro]');
   const bestEl = $('[data-best]');
@@ -95,24 +93,21 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
   const listFormat = new Intl.ListFormat('en-GB', { type: 'conjunction' });
 
   // Settings form <-> settings object
-  const lengthInputs = settingsForm.querySelectorAll<HTMLInputElement>('input[name="length"]');
-  const continentInputs = settingsForm.querySelectorAll<HTMLInputElement>('input[name="continent"]');
-  const modeInputs = settingsForm.querySelectorAll<HTMLInputElement>('input[name="mode"]');
-
   function applySettings(): void {
-    lengthInputs.forEach((el) => (el.checked = el.value === String(settings.length)));
-    continentInputs.forEach((el) => (el.checked = settings.continents.some((c) => c === el.value)));
-    modeInputs.forEach((el) => (el.checked = el.value === settings.mode));
+    setChecked(settingsForm, 'length', [String(settings.length)]);
+    setChecked(settingsForm, 'continent', settings.continents);
+    setChecked(settingsForm, 'mode', [settings.mode]);
   }
 
   function readSettingsForm(): Settings {
     const defaults = defaultSettings(quiz.modes);
-    const checkedLength = Array.from(lengthInputs).find((el) => el.checked)?.value;
-    const checkedMode = Array.from(modeInputs).find((el) => el.checked)?.value;
+    const [length] = checkedValues(settingsForm, 'length');
+    const [mode] = checkedValues(settingsForm, 'mode');
+    const picked = checkedValues(settingsForm, 'continent');
     return {
-      length: LENGTHS.find((option) => String(option) === checkedLength) ?? defaults.length,
-      continents: continents.filter((c) => Array.from(continentInputs).some((el) => el.checked && el.value === c)),
-      mode: quiz.modes.find((option) => option === checkedMode) ?? defaults.mode,
+      length: LENGTHS.find((option) => String(option) === length) ?? defaults.length,
+      continents: continents.filter((c) => picked.includes(c)),
+      mode: quiz.modes.find((option) => option === mode) ?? defaults.mode,
     };
   }
 
@@ -143,8 +138,6 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
 
   function updateSummary(): void {
     const none = settings.continents.length === 0;
-    selectAllBtn.disabled = settings.continents.length === continents.length;
-    clearBtn.disabled = none;
     summaryEls.forEach((el) => (el.textContent = none ? 'Pick at least one continent.' : describe()));
     if (none) {
       bestEl.hidden = true;
@@ -369,40 +362,19 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
   }
 
   // Settings dialog. Changes apply as you make them. Only valid settings (at least one continent) are saved.
-  function settingsChanged(): void {
-    settings = readSettingsForm();
-    if (settings.continents.length) saveSettings(quiz.id, settings);
-    applyMode();
-    updateSummary();
-  }
-  const setAllContinents = (checked: boolean): void => {
-    continentInputs.forEach((el) => (el.checked = checked));
-    settingsChanged();
-    continentInputs[0]?.focus();
-  };
-
-  root.querySelectorAll('[data-open-settings]').forEach((el) =>
-    el.addEventListener('click', () => {
-      settingsDialog.showModal();
-      settingsForm.querySelector<HTMLInputElement>('input:checked')?.focus();
-    }),
-  );
-  settingsForm.addEventListener('change', settingsChanged);
-  selectAllBtn.addEventListener('click', () => setAllContinents(true));
-  clearBtn.addEventListener('click', () => setAllContinents(false));
-  // "Done" needs a continent picked. Closing any other way (Escape, the × button) goes back to the last saved settings.
-  settingsForm.addEventListener('submit', (event) => {
-    if (settings.continents.length) return;
-    event.preventDefault();
-    continentInputs[0]?.focus();
-  });
-  $('[data-settings-close]').addEventListener('click', () => settingsDialog.close());
-  settingsDialog.addEventListener('close', () => {
-    if (settings.continents.length) return;
-    settings = loadSettings(quiz.id, quiz.modes);
-    applySettings();
-    applyMode();
-    updateSummary();
+  const dialog = wireSettingsDialog(root, {
+    onChange() {
+      settings = readSettingsForm();
+      if (settings.continents.length) saveSettings(quiz.id, settings);
+      applyMode();
+      updateSummary();
+    },
+    onRevert() {
+      settings = loadSettings(quiz.id, quiz.modes);
+      applySettings();
+      applyMode();
+      updateSummary();
+    },
   });
 
   // Play controls
@@ -434,6 +406,7 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
   $('[data-again]').addEventListener('click', start);
 
   applySettings();
+  dialog.refresh();
   applyMode();
   updateSummary();
 }

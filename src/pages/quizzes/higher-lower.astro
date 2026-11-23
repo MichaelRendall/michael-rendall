@@ -1,0 +1,171 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Button from '../../components/Button.astro';
+import TextButton from '../../components/TextButton.astro';
+import Window from '../../components/Window.astro';
+import ChipGroup from '../../components/settings/ChipGroup.astro';
+import ContinentsField from '../../components/settings/ContinentsField.astro';
+import SettingsDialog from '../../components/settings/SettingsDialog.astro';
+import { RETRIEVED } from '../../data/country-stats';
+import { flagUrls } from '../../data/flag-urls';
+import { CATEGORIES, CATEGORY_IDS } from '../../scripts/higher-lower/categories';
+import { DEFAULT_SETTINGS } from '../../scripts/higher-lower/game';
+
+const label = 'font-terminal text-label tracking-label';
+const summary = `${CATEGORIES[DEFAULT_SETTINGS.category].label} · all continents`;
+const retrieved = new Date(RETRIEVED).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+// One string, so line wrapping in the markup can't swallow the space before the date.
+const credit = `Figures: World Bank (population 2025, GDP mostly 2025, area 2024) and Wikidata (highest points), retrieved ${retrieved}.`;
+const sides = ['left', 'right'] as const;
+---
+
+<BaseLayout
+  page="quizzes"
+  title="Higher or lower, Michael Rendall"
+  description="Is the next country's population, GDP, area or highest point higher or lower? Keep the streak going."
+>
+  <Window
+    as="main"
+    id="main"
+    title="higher_lower.exe"
+    aria-labelledby="game-title"
+    class="mx-auto w-full max-w-160 shadow-hard-8"
+  >
+    <div data-game data-flags={JSON.stringify(flagUrls)} class="flex flex-col gap-4 p-[clamp(1.25rem,2.5vw,1.75rem)]">
+      <h1
+        id="game-title"
+        class="text-chrome font-pixel text-[clamp(1.75rem,1.25rem+1.5vw,2.5rem)] leading-[1.08] font-bold"
+      >
+        Higher or lower
+      </h1>
+
+      <section data-screen="start" class="flex flex-col items-start gap-3">
+        <p class="text-body leading-[1.6] text-ink-soft">
+          You see one country's figure. Is the next country's higher or lower? Get it right and the next country takes
+          its place. How long can you keep the streak going? Choose population, GDP, area or highest point in Settings.
+        </p>
+        <p data-summary class={label}>
+          {summary}
+        </p>
+        <p data-best hidden class={label}></p>
+        <div class="flex flex-wrap gap-2.5">
+          <Button data-start icon="play">
+            Start game
+          </Button>
+          <Button data-open-settings variant="secondary" icon="sliders">
+            Settings
+          </Button>
+        </div>
+        <p class="text-body-sm text-ink-soft">{credit}</p>
+        <noscript>
+          <p class="text-body">The game needs JavaScript to run.</p>
+        </noscript>
+      </section>
+
+      <section data-screen="play" hidden class="flex flex-col gap-3">
+        {/* Give up sits with the game status, away from the answer buttons, so it's hard to hit by mistake. */}
+        <div class="flex items-center justify-between gap-4">
+          <p class={label}>
+            Streak <span data-streak>0</span>
+          </p>
+          <TextButton data-give-up>Give up</TextButton>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          {sides.map((side) => (
+            <div
+              data-card={side}
+              class:list={[
+                'flex flex-col items-center gap-1.5 border-2 border-ink bg-paper p-3 text-center shadow-hard-4',
+                side === 'right' && 'shadow-pink',
+              ]}
+            >
+              <img
+                data-card-flag
+                alt=""
+                width="160"
+                height="120"
+                class="aspect-4/3 w-full max-w-40 border-2 border-ink object-cover"
+              />
+              <p data-card-name class="font-semibold" />
+              <p data-card-value class="font-pixel text-label-xl font-bold" />
+              <p data-card-detail class="min-h-[1.25em] text-body-sm text-ink-soft" />
+            </div>
+          ))}
+        </div>
+
+        <p id="game-question" data-question class="text-body-lg font-semibold" />
+        {/* Screen readers only: the buttons stay the same between pairs, so this says what changed. */}
+        <p data-announce aria-live="polite" class="sr-only" />
+
+        {/* tabindex="-1": the game focuses the group, not a button, so no focus ring shows until Tab is pressed. */}
+        <div
+          data-guess-group
+          role="group"
+          tabindex="-1"
+          aria-labelledby="game-question"
+          class="flex flex-wrap justify-center gap-2.5 focus:outline-none"
+        >
+          <Button data-higher size="lg">
+            <span aria-hidden="true">▲</span> <span data-label>Higher</span>
+          </Button>
+          <Button data-lower size="lg" variant="secondary">
+            <span aria-hidden="true">▼</span> <span data-label>Lower</span>
+          </Button>
+        </div>
+
+        {/* Feedback on the left, See results on the right, so "Wrong" and the way on read together. */}
+        <div class="mt-1 flex min-h-12 flex-wrap items-center justify-end gap-2.5">
+          <p data-feedback role="status" class="mr-auto text-body font-semibold" />
+          <Button data-continue hidden>
+            See results
+          </Button>
+        </div>
+      </section>
+
+      <section data-screen="results" hidden class="flex flex-col items-start gap-3">
+        <h2 data-result-title tabindex="-1" class="font-pixel text-label-xl font-bold focus:outline-none">
+          Results
+        </h2>
+        <p data-result-best class={label} />
+        <p data-result-last class="text-body text-ink-soft" />
+        <div class="flex flex-wrap gap-2.5">
+          <Button data-again icon="play">
+            Play again
+          </Button>
+          <Button data-open-settings variant="secondary" icon="sliders">
+            Settings
+          </Button>
+        </div>
+      </section>
+
+      <SettingsDialog summary={summary}>
+        <ChipGroup
+          legend="Compare"
+          name="category"
+          type="radio"
+          options={CATEGORY_IDS.map((id) => ({ value: id, label: CATEGORIES[id].label }))}
+          checked={[DEFAULT_SETTINGS.category]}
+        />
+        <ChipGroup
+          legend="Pairs"
+          name="difficulty"
+          type="radio"
+          options={[
+            { value: 'any', label: 'Any' },
+            { value: 'close', label: 'Close calls' },
+          ]}
+          checked={[DEFAULT_SETTINGS.difficulty]}
+        />
+        <ContinentsField />
+      </SettingsDialog>
+    </div>
+  </Window>
+</BaseLayout>
+
+<script>
+  import { initHigherLower } from '../../scripts/higher-lower/game';
+
+  const root = document.querySelector<HTMLElement>('[data-game]');
+  if (root) initHigherLower(root);
+</script>

@@ -1,9 +1,9 @@
 ---
-// The settings pop-up shared by every quiz. src/scripts/quiz/engine.ts reads and saves it.
-import Button from '../Button.astro';
-import TextButton from '../TextButton.astro';
-import TitleBar from '../TitleBar.astro';
-import { continents, countries } from '../../data/countries';
+// The quizzes' settings: answer mode (when a quiz has more than one), game length and continents.
+// src/scripts/quiz/engine.ts reads and saves them.
+import ChipGroup from '../settings/ChipGroup.astro';
+import ContinentsField from '../settings/ContinentsField.astro';
+import SettingsDialog from '../settings/SettingsDialog.astro';
 import { MODE_LABELS, type Mode } from '../../scripts/quiz/definition';
 import { LENGTHS, defaultSettings } from '../../scripts/quiz/settings';
 
@@ -19,98 +19,24 @@ interface Props {
 const { unit, modes, summary } = Astro.props;
 const defaults = defaultSettings(modes);
 const unitTitle = unit.charAt(0).toUpperCase() + unit.slice(1);
-const countIn = (continent: string): number => countries.filter((c) => c.continent === continent).length;
-
-const label = 'font-terminal text-label tracking-label';
-// Settings chips: a visually hidden radio or checkbox inside a clickable label. The tick marks the
-// selected chips without relying on colour alone.
-const chip = [
-  'group inline-flex min-h-10 cursor-pointer items-center gap-1.5 border-2 border-ink bg-paper px-3',
-  'font-terminal text-label tracking-label text-ink hover:bg-mint-mist',
-  'has-checked:bg-mint-light has-checked:shadow-hard-3 has-checked:shadow-pink',
-  'has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-violet',
-];
-const tick = 'hidden group-has-checked:inline';
 ---
 
-<dialog
-  data-settings-dialog
-  aria-labelledby="settings-title"
-  class="m-auto max-h-[calc(100dvh-2rem)] w-[min(34rem,calc(100%-2rem))] border-2 border-ink bg-paper text-ink shadow-hard-8 backdrop:bg-ink/40"
->
-  <TitleBar size="md">
-    <h2 id="settings-title" class="font-terminal text-label-lg font-normal tracking-label">
-      settings.ini
-    </h2>
-    <button
-      slot="end"
-      type="button"
-      data-settings-close
-      aria-label="Close settings"
-      class="grid size-7 cursor-pointer place-items-center border-2 border-ink bg-paper font-terminal text-label-lg leading-none hover:bg-pink-light focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-violet"
-    >
-      ×
-    </button>
-  </TitleBar>
-  <form data-settings method="dialog" class="flex flex-col items-start gap-5 p-[clamp(1.25rem,2.5vw,1.75rem)]">
-    {modes.length > 1 && (
-      <fieldset class="flex flex-col gap-1.5">
-        <legend class:list={[label, 'mb-1.5']}>Answer by</legend>
-        <div class="flex flex-wrap gap-2">
-          {modes.map((mode) => (
-            <label class:list={chip}>
-              <input type="radio" name="mode" value={mode} checked={mode === defaults.mode} class="sr-only" />
-              <span aria-hidden="true" class={tick}>
-                ✓
-              </span>
-              {MODE_LABELS[mode]}
-            </label>
-          ))}
-        </div>
-      </fieldset>
-    )}
-    <fieldset class="flex flex-col gap-1.5">
-      <legend class:list={[label, 'mb-1.5']}>{unitTitle} per game</legend>
-      <div class="flex flex-wrap gap-2">
-        {LENGTHS.map((length) => (
-          <label class:list={chip}>
-            <input
-              type="radio"
-              name="length"
-              value={String(length)}
-              checked={length === defaults.length}
-              class="sr-only"
-            />
-            <span aria-hidden="true" class={tick}>
-              ✓
-            </span>
-            {length === 'all' ? 'All' : length}
-          </label>
-        ))}
-      </div>
-    </fieldset>
-    <fieldset class="flex flex-col gap-1.5">
-      <legend class:list={[label, 'mb-1.5']}>Continents</legend>
-      <div class="flex flex-wrap gap-2">
-        {continents.map((continent) => (
-          <label class:list={chip}>
-            <input type="checkbox" name="continent" value={continent} checked class="sr-only" />
-            <span aria-hidden="true" class={tick}>
-              ✓
-            </span>
-            {continent}
-            <span class="text-ink-soft">({countIn(continent)})</span>
-          </label>
-        ))}
-      </div>
-      <div class="mt-1 flex gap-4">
-        <TextButton data-select-all>Select all</TextButton>
-        <TextButton data-clear>Clear</TextButton>
-      </div>
-    </fieldset>
-    <p data-summary aria-live="polite" class={label}>
-      {summary}
-    </p>
-    <Button type="submit">Done</Button>
-  </form>
-</dialog>
+<SettingsDialog summary={summary}>
+  {modes.length > 1 && (
+    <ChipGroup
+      legend="Answer by"
+      name="mode"
+      type="radio"
+      options={modes.map((mode) => ({ value: mode, label: MODE_LABELS[mode] }))}
+      checked={[defaults.mode]}
+    />
+  )}
+  <ChipGroup
+    legend={`${unitTitle} per game`}
+    name="length"
+    type="radio"
+    options={LENGTHS.map((length) => ({ value: String(length), label: length === 'all' ? 'All' : String(length) }))}
+    checked={[String(defaults.length)]}
+  />
+  <ContinentsField />
+</SettingsDialog>

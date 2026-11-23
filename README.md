@@ -10,14 +10,20 @@ src/
   layouts/        BaseLayout.astro: <head>, scene, header and footer shared by every page
   components/     Scene (the beach SVG), Backdrop, SiteHeader, SiteFooter, Window,
                   TitleBar, Button, Icon, QuizCard
-                  quiz/: Quiz and QuizSettings, the screens and settings pop-up every quiz shares
+                  quiz/: Quiz and QuizSettings, the screens and settings every quiz shares
+                  settings/: the settings pop-up pieces every game uses (dialog, chips, continents)
   data/           quizzes.ts: the cards on the quizzes page. countries.ts: the countries every quiz uses.
                   capitals.ts: capitals and the cities offered as wrong answers
+                  country-stats.ts: population, GDP, area and highest points (generated, see tools/)
+                  flag-urls.ts: build-time map of country code to flag file
   scripts/        main.ts: footer clock (Glasgow time) and year
                   quiz/: the shared quiz engine, settings and answer matching, plus one
                   definition per quiz (flags.ts, capitals.ts)
+                  higher-lower/: the higher-or-lower game and its categories
+                  settings-dialog.ts: client side of the shared settings pop-up
   styles/         global.css: Tailwind, fonts, colour and shadow tokens
 public/           Files copied to the site root unchanged (favicons, robots.txt, images)
+tools/            fetch-country-stats.mjs (downloads the higher-or-lower figures), make-grain.py
 ```
 
 ## Run it
@@ -53,6 +59,8 @@ Vercel builds the site on every push to the connected Git repository. Production
 ## Common changes
 
 - **Add a quiz:** write a definition in `src/scripts/quiz/<name>.ts` (see `definition.ts` and the two existing quizzes), create `src/pages/quizzes/<name>.astro` using the `Quiz` component (copy `flags.astro`), then add a card in `src/data/quizzes.ts` with `href: '/quizzes/<name>'`. A card without an `href` shows as "Coming soon".
+- **Update the higher-or-lower figures:** run `node tools/fetch-country-stats.mjs`. It downloads the latest World Bank and Wikidata figures and rewrites `src/data/country-stats.ts`, then lists any gaps. Review the diff before committing.
+- **Add a higher-or-lower category:** add a field to the script, rerun it, and add an entry in `src/scripts/higher-lower/categories.ts`.
 - **Add a page:** create `src/pages/<name>.astro` and wrap it in `<BaseLayout>`. It's served at `/<name>` (Vercel's `cleanUrls`). Add a link in `SiteHeader.astro`, and add the page to `BaseLayout`'s `page` prop type.
 - **Change colours or fonts:** edit the `@theme` block in `src/styles/global.css`. Every `bg-*`, `text-*`, `border-*` and `shadow-*` class picks up the change.
 - **Change the favicon:** edit `public/favicon.svg`. Modern browsers use it directly. `favicon.ico` (for older browsers) and `apple-touch-icon.png` (for iOS home screens) are PNG renders of it, so export new copies at 32px and 180px when the SVG changes.

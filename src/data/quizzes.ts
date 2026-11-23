@@ -34,4 +34,13 @@ export const quizzes: Quiz[] = [
     shadow: 'pink',
     href: '/quizzes/capitals',
   },
+  {
+    file: 'higher_lower.exe',
+    name: 'Higher or lower',
+    summary: 'Is the next country higher or lower? Population, GDP, area or highest point. Keep the streak going.',
+    icon: 'updown',
+    previewColours: ['#d9c8ff', '#9ff3ec'],
+    shadow: 'lilac',
+    href: '/quizzes/higher-lower',
+  },
 ];
