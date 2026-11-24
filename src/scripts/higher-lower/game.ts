@@ -100,6 +100,11 @@ export function initHigherLower(root: HTMLElement): void {
   let settings = loadSettings();
   let left: Country | undefined;
   let right: Country | undefined;
+  /**
+   * The country that comes in next if this answer is right, picked early so its flag is already
+   * downloaded and decoded by the time it slides in.
+   */
+  let upcoming: Country | undefined;
   let streak = 0;
   /** Countries used this game, so pairs don't repeat until the pool runs out. */
   let used = new Set<string>();
@@ -178,6 +183,20 @@ export function initHigherLower(root: HTMLElement): void {
     return next;
   }
 
+  /** Fetches and decodes a flag in the background, so showing it later is instant. */
+  function preload(country: Country): void {
+    const img = new Image();
+    img.src = flags[country.code] ?? '';
+    img.decode().catch(() => undefined);
+  }
+
+  /** Picks the country after `right` now, while the player is still deciding, and preloads its flag. */
+  function prepareUpcoming(): void {
+    if (!right) return;
+    upcoming = pickNext(right);
+    preload(upcoming);
+  }
+
   function fillCard(side: 'left' | 'right', country: Country, reveal: boolean): void {
     const el = cards[side];
     el.flag.src = flags[country.code] ?? '';
@@ -200,6 +219,7 @@ export function initHigherLower(root: HTMLElement): void {
     right = pickNext(left);
     show('play');
     showPair();
+    prepareUpcoming();
   }
 
   function showPair(): void {
@@ -246,8 +266,9 @@ export function initHigherLower(root: HTMLElement): void {
       const next = right;
       advanceTimer = window.setTimeout(() => {
         left = next;
-        right = pickNext(next);
+        right = upcoming ?? pickNext(next);
         showPair();
+        prepareUpcoming();
       }, ADVANCE_DELAY);
       return;
     }
