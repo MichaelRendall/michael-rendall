@@ -19,7 +19,7 @@ src/
                   shapes.ts: how island nations are drawn, and countries left out of the shapes quiz
                   quizzes.ts, games.ts: the cards on the two hub pages
                   charades-prompts.ts: the charades prompts, by category and difficulty
-  scripts/        main.ts: footer clock (Glasgow time) and year
+  scripts/        main.ts: keeps the footer's copyright year current
                   quiz/: the shared quiz engine, settings and answer matching, plus one
                   definition per quiz (flags.ts, capitals.ts, shapes.ts)
                   higher-lower/: the higher-or-lower game and its categories

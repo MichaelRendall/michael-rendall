@@ -1,6 +1,5 @@
 ---
-// The clock and year are filled in by src/scripts/main.ts. The year is also
-// rendered at build time so it shows without JavaScript.
+// The year is rendered at build time and kept current by src/scripts/main.ts.
 interface Props {
   /** Pushes the footer to the bottom of a flex column. */
   pinBottom?: boolean;
@@ -12,20 +11,7 @@ const { pinBottom = false } = Astro.props;
 const chip = 'bg-paper/75 px-3 py-1 font-terminal text-label tracking-label';
 ---
 
-<footer data-anim="intro" class:list={['flex flex-wrap justify-between gap-3', pinBottom && 'mt-auto']}>
-  {/*
-    The triangle is an SVG, not "▸": VT323 has no such character, and the fallback font's taller line made
-    this chip taller than the other. Flex with a gap spaces and centres it without relying on whitespace.
-  */}
-  <span class:list={[chip, 'inline-flex items-center gap-[0.45em]']}>
-    <span>Glasgow</span>
-    <svg aria-hidden="true" viewBox="0 0 6 8" class="size-[0.45em] shrink-0 fill-current">
-      <path d="M0 0l6 4-6 4z"></path>
-    </svg>
-    <span>
-      local time <time data-clock>--:--</time>
-    </span>
-  </span>
+<footer data-anim="intro" class:list={['flex justify-end', pinBottom && 'mt-auto']}>
   <span class={chip}>
     © <span data-year>{new Date().getFullYear()}</span> Michael Rendall
   </span>
