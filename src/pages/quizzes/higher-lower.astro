@@ -64,7 +64,7 @@ const sides = ['left', 'right'] as const;
 
       <section data-screen="play" hidden class="flex flex-col gap-3">
         {/* Give up sits with the game status, away from the answer buttons, so it's hard to hit by mistake. */}
-        <div class="flex items-center justify-between gap-4">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
           <p class={label}>
             Streak <span data-streak>0</span>
           </p>

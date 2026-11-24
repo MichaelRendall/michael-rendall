@@ -179,6 +179,9 @@ export function initHigherLower(root: HTMLElement): void {
     el.flag.src = flags[country.code] ?? '';
     el.name.textContent = country.name;
     el.value.textContent = reveal ? category().format(valueOf(country)) : '?';
+    // Only some categories have a detail line (the peak's name). For those, it keeps its space while
+    // empty so the card doesn't jump when it fills in; for the rest it's removed entirely.
+    el.detail.hidden = !category().detail;
     el.detail.textContent = reveal ? (category().detail?.(country) ?? '') : '';
   }
 
