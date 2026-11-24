@@ -2,6 +2,7 @@
 // The window, screens and controls shared by every quiz. The page passes its QuizDefinition
 // and runs src/scripts/quiz/engine.ts with the same definition.
 import Button from '../Button.astro';
+import { SHADOW_CLASS, type ShadowColour } from '../../data/cards';
 import TextButton from '../TextButton.astro';
 import Window from '../Window.astro';
 import QuizSettings from './QuizSettings.astro';
@@ -19,9 +20,11 @@ interface Props {
   images?: Record<string, string>;
   /** The window's title bar, e.g. "flags.exe". */
   windowTitle: string;
+  /** The window's shadow colour: the same as the quiz's card on the Quizzes page. */
+  shadow?: ShadowColour;
 }
 
-const { quiz, heading, windowTitle, images } = Astro.props;
+const { quiz, heading, windowTitle, images, shadow = 'mint' } = Astro.props;
 const defaults = defaultSettings(quiz.modes);
 // Rendered at build time, matching what the engine shows for the default settings.
 const summary = [
@@ -38,7 +41,7 @@ const label = 'font-terminal text-label tracking-label';
   id="main"
   title={windowTitle}
   aria-labelledby="quiz-title"
-  class="mx-auto w-full max-w-136 shadow-hard-8"
+  class:list={['mx-auto w-full max-w-136 shadow-hard-8', SHADOW_CLASS[shadow]]}
 >
   <div
     data-quiz

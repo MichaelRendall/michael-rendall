@@ -10,7 +10,14 @@ interface Props {
 const { fixed = false } = Astro.props;
 ---
 
-<div aria-hidden="true" class:list={['pointer-events-none inset-0', fixed ? 'fixed' : 'absolute']}>
+{/*
+  Fixed: sized to the largest screen height (lvh, browser bars hidden), so the scene doesn't rescale as the
+  bars hide and show on phones. While they're showing, they simply cover its bottom edge.
+*/}
+<div
+  aria-hidden="true"
+  class:list={['pointer-events-none', fixed ? 'fixed top-0 left-0 h-lvh w-full' : 'absolute inset-0']}
+>
   <Scene />
   {/* Film grain: a small repeating tile of black pixels at varying transparency. Cheaper than the live SVG
       noise filter it replaced, and it needs no blend mode. To change the look, edit and rerun tools/make-grain.py. */}

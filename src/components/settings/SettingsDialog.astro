@@ -16,7 +16,8 @@ const { summary } = Astro.props;
 <dialog
   data-settings-dialog
   aria-labelledby="settings-title"
-  class="m-auto max-h-[calc(100dvh-2rem)] w-[min(34rem,calc(100%-2rem))] border-2 border-ink bg-paper text-ink shadow-hard-8 backdrop:bg-ink/40"
+  tabindex="-1"
+  class="m-auto focus:outline-none max-h-[calc(100dvh-2rem)] w-[min(34rem,calc(100%-2rem))] border-2 border-ink bg-paper text-ink shadow-hard-8 shadow-lilac backdrop:bg-ink/40"
 >
   <TitleBar size="md">
     <h2 id="settings-title" class="font-terminal text-label-lg font-normal tracking-label">

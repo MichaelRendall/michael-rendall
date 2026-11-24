@@ -97,16 +97,20 @@ export function wireSettingsDialog(
     refresh();
   }
 
+  // The tapped button disables itself (nothing left to select or clear), which would drop focus, so focus
+  // moves to the other one. A button, not an option, so no focus ring appears after a tap.
   const setAll = (checked: boolean): void => {
     requiredInputs.forEach((el) => (el.checked = checked));
     changed();
-    requiredInputs[0]?.focus();
+    (checked ? clearBtn : selectAllBtn).focus();
   };
 
   root.querySelectorAll('[data-open-settings]').forEach((el) =>
     el.addEventListener('click', () => {
       dialog.showModal();
-      form.querySelector<HTMLInputElement>('input:checked')?.focus();
+      // Focus the pop-up itself, not its first option: screen readers announce it, Tab reaches the
+      // options, and no focus ring shows until the player uses the keyboard.
+      dialog.focus();
     }),
   );
   form.addEventListener('change', changed);
