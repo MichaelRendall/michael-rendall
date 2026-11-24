@@ -24,8 +24,6 @@ import { checkedValues, setChecked, wireSettingsDialog } from '../settings-dialo
 
 /** How long a right answer stays on screen before the next question, in ms. */
 const ADVANCE_DELAY = 1200;
-/** How long "Give up" waits for the confirming second click, in ms. */
-const GIVE_UP_CONFIRM = 3000;
 
 const CHOICE_CLASS = [
   'flex min-h-12 w-full items-center gap-3 border-2 border-ink bg-paper px-3 py-2 text-left text-body font-semibold text-ink',
@@ -64,7 +62,6 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
   const choicesEl = $('[data-choices]');
   const continueBtn = $<HTMLButtonElement>('[data-continue]');
   const giveUpBtn = $<HTMLButtonElement>('[data-give-up]');
-  const giveUpLabel = giveUpBtn.innerHTML;
   const feedback = $('[data-feedback]');
   const resultTitle = $('[data-result-title]');
   const resultBest = $('[data-result-best]');
@@ -80,7 +77,6 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
   let picks = new Map<number, string>();
   let current = 0;
   let advanceTimer: number | undefined;
-  let giveUpTimer: number | undefined;
 
   const show = (name: keyof typeof screens): void => {
     for (const [key, el] of Object.entries(screens)) el.hidden = key !== name;
@@ -163,7 +159,6 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
 
   function showQuestion(index: number): void {
     window.clearTimeout(advanceTimer);
-    resetGiveUp();
     current = index;
     const country = round[index];
     roundEl.textContent = String(index + 1);
@@ -298,25 +293,8 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
   }
 
   // Giving up and results
-  function resetGiveUp(): void {
-    window.clearTimeout(giveUpTimer);
-    giveUpTimer = undefined;
-    giveUpBtn.innerHTML = giveUpLabel;
-  }
-
-  /** The first click asks for confirmation, so a stray click can't end a long game. */
-  function giveUp(): void {
-    if (giveUpTimer === undefined) {
-      giveUpBtn.textContent = 'Sure? Click again';
-      giveUpTimer = window.setTimeout(resetGiveUp, GIVE_UP_CONFIRM);
-      return;
-    }
-    finish();
-  }
-
   function finish(): void {
     window.clearTimeout(advanceTimer);
-    resetGiveUp();
     const total = round.length;
     const score = solved.size;
     const previous = readBest(quiz.id, settings);
@@ -401,7 +379,7 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
     }
   });
   continueBtn.addEventListener('click', advance);
-  giveUpBtn.addEventListener('click', giveUp);
+  giveUpBtn.addEventListener('click', finish);
   $('[data-start]').addEventListener('click', start);
   $('[data-again]').addEventListener('click', start);
 

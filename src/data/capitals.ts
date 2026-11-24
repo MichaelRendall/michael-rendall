@@ -127,6 +127,7 @@ export const capitals: Record<string, CapitalInfo> = {
   kr: { capital: 'Seoul', cities: ['Busan', 'Incheon', 'Daegu'] },
   lk: { capital: 'Sri Jayawardenepura Kotte', also: ['Colombo'], cities: ['Kandy', 'Galle', 'Jaffna'] },
   sy: { capital: 'Damascus', cities: ['Aleppo', 'Homs', 'Latakia'] },
+  tw: { capital: 'Taipei', cities: ['Kaohsiung', 'Taichung', 'Tainan'] },
   tj: { capital: 'Dushanbe', cities: ['Khujand', 'Kulob', 'Bokhtar'] },
   th: { capital: 'Bangkok', cities: ['Chiang Mai', 'Phuket', 'Pattaya'] },
   tl: { capital: 'Dili', cities: ['Baucau', 'Maliana', 'Lospalos'] },

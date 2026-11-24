@@ -1,5 +1,5 @@
-// The 193 UN member states, plus Vatican City and Kosovo. `code` is the ISO 3166-1 alpha-2 code (Kosovo uses
-// the widely adopted "xk"), which is also the flag's file name in flag-icons.
+// The 193 UN member states, plus Vatican City, Kosovo and Taiwan. `code` is the ISO 3166-1 alpha-2 code
+// (Kosovo uses the widely adopted "xk"), which is also the flag's file name in flag-icons.
 // `aliases` are other names a player might reasonably type. Accents, capitals, punctuation, "the" and
 // "Saint"/"St" don't matter (see src/scripts/quiz/match.ts), so there's no need to list those variations.
 
@@ -193,6 +193,7 @@ export const countries: Country[] = [
   { code: 'se', continent: 'Europe', name: 'Sweden' },
   { code: 'ch', continent: 'Europe', name: 'Switzerland' },
   { code: 'sy', continent: 'Asia', name: 'Syria' },
+  { code: 'tw', continent: 'Asia', name: 'Taiwan', aliases: ['Republic of China'] },
   { code: 'tj', continent: 'Asia', name: 'Tajikistan' },
   { code: 'tz', continent: 'Africa', name: 'Tanzania' },
   { code: 'th', continent: 'Asia', name: 'Thailand' },

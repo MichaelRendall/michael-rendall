@@ -6,8 +6,6 @@ import { CATEGORIES, CATEGORY_IDS, type CategoryId } from './categories';
 
 /** How long a right answer's figure stays on screen before the next pair, in ms. */
 const ADVANCE_DELAY = 1400;
-/** How long "Give up" waits for the confirming second click, in ms. */
-const GIVE_UP_CONFIRM = 3000;
 const ID = 'higher-lower';
 
 export const DIFFICULTIES = ['any', 'close'] as const;
@@ -86,7 +84,6 @@ export function initHigherLower(root: HTMLElement): void {
   const lowerLabel = $('[data-lower] [data-label]');
   const continueBtn = $<HTMLButtonElement>('[data-continue]');
   const giveUpBtn = $<HTMLButtonElement>('[data-give-up]');
-  const giveUpLabel = giveUpBtn.innerHTML;
   const feedback = $('[data-feedback]');
   const resultTitle = $('[data-result-title]');
   const resultBest = $('[data-result-best]');
@@ -108,7 +105,6 @@ export function initHigherLower(root: HTMLElement): void {
   let used = new Set<string>();
   let revealing = false;
   let advanceTimer: number | undefined;
-  let giveUpTimer: number | undefined;
 
   const category = () => CATEGORIES[settings.category];
   const valueOf = (country: Country): number => category().value(country) ?? 0;
@@ -183,12 +179,14 @@ export function initHigherLower(root: HTMLElement): void {
     el.flag.src = flags[country.code] ?? '';
     el.name.textContent = country.name;
     el.value.textContent = reveal ? category().format(valueOf(country)) : '?';
+    // Only some categories have a detail line (the peak's name). For those, it keeps its space while
+    // empty so the card doesn't jump when it fills in; for the rest it's removed entirely.
+    el.detail.hidden = !category().detail;
     el.detail.textContent = reveal ? (category().detail?.(country) ?? '') : '';
   }
 
   function start(): void {
     window.clearTimeout(advanceTimer);
-    resetGiveUp();
     const countriesAvailable = pool();
     if (countriesAvailable.length < 2) return;
     streak = 0;
@@ -229,7 +227,6 @@ export function initHigherLower(root: HTMLElement): void {
     if (revealing || !left || !right) return;
     revealing = true;
     [higherBtn, lowerBtn].forEach((btn) => btn.setAttribute('aria-disabled', 'true'));
-    resetGiveUp();
     fillCard('right', right, true);
 
     const a = category().rounded(valueOf(left));
@@ -258,26 +255,14 @@ export function initHigherLower(root: HTMLElement): void {
   }
 
   // Giving up and results
-  function resetGiveUp(): void {
-    window.clearTimeout(giveUpTimer);
-    giveUpTimer = undefined;
-    giveUpBtn.innerHTML = giveUpLabel;
-  }
-
-  /** The first click asks for confirmation, so a stray click can't end a long streak. */
+  /** Ends the game, showing the hidden figure so the last pair is complete. */
   function giveUp(): void {
-    if (giveUpTimer === undefined) {
-      giveUpBtn.textContent = 'Sure? Click again';
-      giveUpTimer = window.setTimeout(resetGiveUp, GIVE_UP_CONFIRM);
-      return;
-    }
     if (right && !revealing) fillCard('right', right, true);
     finish();
   }
 
   function finish(): void {
     window.clearTimeout(advanceTimer);
-    resetGiveUp();
     const previous = readBest(settings);
     const isBest = streak > 0 && (previous === null || streak > previous);
     if (isBest) save(bestKey(settings), String(streak));

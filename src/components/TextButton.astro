@@ -11,7 +11,7 @@ const { type = 'button', ...attrs } = Astro.props;
 <button
   type={type}
   class:list={[
-    'inline-flex min-h-6 cursor-pointer items-center font-terminal text-label-sm tracking-label underline underline-offset-4 hover:text-accent',
+    'inline-flex min-h-6 shrink-0 cursor-pointer items-center font-terminal whitespace-nowrap text-label-sm tracking-label underline underline-offset-4 hover:text-accent',
     'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-violet',
     'disabled:cursor-default disabled:no-underline disabled:opacity-50',
   ]}

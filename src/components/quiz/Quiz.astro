@@ -65,19 +65,33 @@ const label = 'font-terminal text-label tracking-label';
 
     <section data-screen="play" hidden class="flex flex-col gap-3">
       {/* Give up sits with the game status, away from the answer controls, so it's hard to hit by mistake. */}
-      <div class="flex items-center justify-between gap-4">
-        <p class={label}>
-          {quiz.progressLabel} <span data-round>1</span> of <span data-total>{defaults.length}</span>
-          <span aria-hidden="true">·</span> Score <span data-score>0</span>
+      {/*
+        Reads "1 / 46 | Score 0". Screen readers hear "Question 1 of 46, Score 0" from the hidden words.
+        Baseline alignment keeps it level with Give up, which is a slightly smaller size.
+        Spaces are written as {' '} because Astro drops line breaks next to elements.
+      */}
+      <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <p class:list={[label, 'whitespace-nowrap']}>
+          <span class="sr-only">{quiz.progressLabel} </span>
+          <span data-round>1</span>
+          <span aria-hidden="true">{' / '}</span>
+          <span class="sr-only">{' of '}</span>
+          <span data-total>{defaults.length}</span>
+          <span aria-hidden="true" class="mx-[0.6em] text-ink-soft/50">
+            |
+          </span>
+          <span class="sr-only">{', '}</span>
+          Score <span data-score>0</span>
         </p>
         <TextButton data-give-up>Give up</TextButton>
       </div>
+      {/* On phones the flag is also capped at 28% of the visible height, so the answers fit below it. */}
       <img
         data-flag
         alt=""
         width="640"
         height="480"
-        class="mx-auto aspect-4/3 w-full max-w-72 border-2 border-ink bg-paper object-cover shadow-hard-4 shadow-lilac"
+        class="mx-auto aspect-4/3 w-full max-w-72 border-2 max-sm:max-w-[min(18rem,28svh)] border-ink bg-paper object-cover shadow-hard-4 shadow-lilac"
       />
       <p id="quiz-question" data-question class="text-body-lg font-semibold"></p>
       {/* Screen readers only: says which question is next when the quiz moves on by itself. */}
