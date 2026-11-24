@@ -40,7 +40,7 @@ export const capitalsQuiz: QuizDefinition = {
   },
   missedHeading: 'Capitals you missed',
   question: (country) => `What's the capital of ${nameInSentence(country)}?`,
-  flagAlt: (country) => `Flag of ${country.name}`,
+  imageAlt: (country) => `Flag of ${country.name}`,
   answer: (country) => infoFor(country).capital,
   options,
   missed: (country, pick) => {

@@ -7,7 +7,7 @@
 // - choice: the player taps one of four options. One tap per question, in order. A wrong tap shows the
 //   right answer and waits for "Next question".
 // Either way the game ends when every question is done, or when the player gives up.
-import { continents, type Country } from '../../data/countries';
+import { continents, countries, type Country } from '../../data/countries';
 import { MODE_LABELS, shuffle, type Mode, type QuizDefinition } from './definition';
 import {
   defaultSettings,
@@ -40,6 +40,9 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
   };
 
   const flags = JSON.parse(root.dataset.flags ?? '{}') as Record<string, string>;
+  // The question's picture: the quiz's own images (country shapes) if the page gives them, else the flags.
+  const images = root.dataset.images ? (JSON.parse(root.dataset.images) as Record<string, string>) : flags;
+  const base = quiz.countries ?? countries;
   const screens = {
     start: $('[data-screen="start"]'),
     play: $('[data-screen="play"]'),
@@ -52,7 +55,7 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
   const roundEl = $('[data-round]');
   const totalEl = $('[data-total]');
   const scoreEl = $('[data-score]');
-  const flagImg = $<HTMLImageElement>('[data-flag]');
+  const pictureImg = $<HTMLImageElement>('[data-picture]');
   const questionEl = $('[data-question]');
   const announceEl = $('[data-announce]');
   const input = $<HTMLInputElement>('[data-guess]');
@@ -83,7 +86,7 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
   };
 
   const preload = (country: Country | undefined): void => {
-    if (country) new Image().src = flags[country.code] ?? '';
+    if (country) new Image().src = images[country.code] ?? '';
   };
 
   const listFormat = new Intl.ListFormat('en-GB', { type: 'conjunction' });
@@ -118,10 +121,10 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
 
   /** The summary tags: ["10 flags", "All continents"], ["All 46 flags", "Europe", "Typing"]. */
   function describe(): string[] {
-    const total = totalFor(settings);
+    const total = totalFor(settings, base);
     const everywhere = settings.continents.length === continents.length;
     return [
-      total === poolFor(settings).length ? `All ${total} ${quiz.unit}` : `${total} ${quiz.unit}`,
+      total === poolFor(settings, base).length ? `All ${total} ${quiz.unit}` : `${total} ${quiz.unit}`,
       everywhere ? 'All continents' : listFormat.format(settings.continents),
       ...(quiz.modes.length > 1 ? [MODE_LABELS[settings.mode]] : []),
     ];
@@ -134,8 +137,8 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
       renderBest(bestEl, null);
       return;
     }
-    const best = readBest(quiz.id, settings);
-    const total = totalFor(settings);
+    const best = readBest(quiz.id, settings, base);
+    const total = totalFor(settings, base);
     renderBest(
       bestEl,
       best === null
@@ -147,7 +150,7 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
   // Game
   function start(): void {
     window.clearTimeout(advanceTimer);
-    round = shuffle(poolFor(settings)).slice(0, totalFor(settings));
+    round = shuffle(poolFor(settings, base)).slice(0, totalFor(settings, base));
     solved = new Set();
     answered = new Set();
     picks = new Map();
@@ -162,8 +165,8 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
     current = index;
     const country = round[index];
     roundEl.textContent = String(index + 1);
-    flagImg.src = flags[country.code] ?? '';
-    flagImg.alt = quiz.flagAlt(country);
+    pictureImg.src = images[country.code] ?? '';
+    pictureImg.alt = quiz.imageAlt(country);
     questionEl.textContent = quiz.question(country);
     setFeedback('');
     // Type mode keeps focus in the text box, so nothing else tells a screen reader the question changed.
@@ -297,9 +300,9 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
     window.clearTimeout(advanceTimer);
     const total = round.length;
     const score = solved.size;
-    const previous = readBest(quiz.id, settings);
+    const previous = readBest(quiz.id, settings, base);
     const isBest = score > 0 && (previous === null || score > previous);
-    if (isBest) saveBest(quiz.id, settings, score);
+    if (isBest) saveBest(quiz.id, settings, score, base);
 
     resultTitle.textContent = score === total ? `You got all ${total}!` : `You got ${score} out of ${total}`;
     renderBest(
@@ -318,12 +321,13 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
         const entry = quiz.missed(country, picks.get(index));
         const li = document.createElement('li');
         li.className = 'flex items-center gap-3';
+        // The question's own picture: the flag in Flags and Capitals, the outline in Shapes.
         const img = document.createElement('img');
-        img.src = flags[country.code] ?? '';
+        img.src = images[country.code] ?? '';
         img.alt = '';
         img.width = 48;
         img.height = 36;
-        img.className = 'aspect-4/3 w-12 shrink-0 border-2 border-ink object-cover';
+        img.className = 'aspect-4/3 w-12 shrink-0 border-2 border-ink bg-paper object-cover';
         const text = document.createElement('span');
         text.className = 'flex flex-col';
         const title = document.createElement('span');

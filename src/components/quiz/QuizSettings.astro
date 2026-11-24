@@ -4,6 +4,7 @@
 import ChipGroup from '../settings/ChipGroup.astro';
 import ContinentsField from '../settings/ContinentsField.astro';
 import SettingsDialog from '../settings/SettingsDialog.astro';
+import type { Country } from '../../data/countries';
 import { MODE_LABELS, type Mode } from '../../scripts/quiz/definition';
 import { LENGTHS, defaultSettings } from '../../scripts/quiz/settings';
 
@@ -12,11 +13,13 @@ interface Props {
   unit: string;
   /** The quiz's modes. With more than one, the player picks how to answer. */
   modes: readonly Mode[];
+  /** The quiz's countries, if not all of them, so the continent counts match. */
+  countries?: readonly Country[];
   /** The summary tags for the default settings. */
   summary: string[];
 }
 
-const { unit, modes, summary } = Astro.props;
+const { unit, modes, summary, countries } = Astro.props;
 const defaults = defaultSettings(modes);
 const unitTitle = unit.charAt(0).toUpperCase() + unit.slice(1);
 ---
@@ -38,5 +41,5 @@ const unitTitle = unit.charAt(0).toUpperCase() + unit.slice(1);
     options={LENGTHS.map((length) => ({ value: String(length), label: length === 'all' ? 'All' : String(length) }))}
     checked={[String(defaults.length)]}
   />
-  <ContinentsField />
+  <ContinentsField countries={countries} />
 </SettingsDialog>

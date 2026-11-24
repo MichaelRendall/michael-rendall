@@ -2,8 +2,14 @@
 // The continent filter every game shares, with Select all and Clear.
 import ChipGroup from './ChipGroup.astro';
 import TextButton from '../TextButton.astro';
-import { continents, countries } from '../../data/countries';
+import { continents, countries as allCountries, type Country } from '../../data/countries';
 
+interface Props {
+  /** The game's countries, if not all of them, so each continent's count matches what can come up. */
+  countries?: readonly Country[];
+}
+
+const { countries = allCountries } = Astro.props;
 const options = continents.map((continent) => ({
   value: continent,
   label: continent,

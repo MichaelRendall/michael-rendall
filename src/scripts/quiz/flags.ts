@@ -25,7 +25,7 @@ export const flagsQuiz: QuizDefinition = {
   },
   missedHeading: "Flags you didn't get",
   question: () => 'Which country is this?',
-  flagAlt: () => 'The flag to identify',
+  imageAlt: () => 'The flag to identify',
   answer: (country) => country.name,
   isCorrect,
   options,

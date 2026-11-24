@@ -15,11 +15,13 @@ interface Props {
   quiz: QuizDefinition;
   /** The page heading, e.g. "Flags". */
   heading: string;
+  /** Pictures to ask about instead of flags (country code to URL), e.g. the shapes quiz's outlines. */
+  images?: Record<string, string>;
   /** The window's title bar, e.g. "flags.exe". */
   windowTitle: string;
 }
 
-const { quiz, heading, windowTitle } = Astro.props;
+const { quiz, heading, windowTitle, images } = Astro.props;
 const defaults = defaultSettings(quiz.modes);
 // Rendered at build time, matching what the engine shows for the default settings.
 const summary = [
@@ -38,7 +40,12 @@ const label = 'font-terminal text-label tracking-label';
   aria-labelledby="quiz-title"
   class="mx-auto w-full max-w-136 shadow-hard-8"
 >
-  <div data-quiz data-flags={JSON.stringify(flagUrls)} class="flex flex-col gap-4 p-[clamp(1.25rem,2.5vw,1.75rem)]">
+  <div
+    data-quiz
+    data-flags={JSON.stringify(flagUrls)}
+    data-images={images ? JSON.stringify(images) : undefined}
+    class="flex flex-col gap-4 p-[clamp(1.25rem,2.5vw,1.75rem)]"
+  >
     <h1
       id="quiz-title"
       class="text-chrome font-pixel text-[clamp(1.75rem,1.25rem+1.5vw,2.5rem)] leading-[1.08] font-bold"
@@ -92,7 +99,7 @@ const label = 'font-terminal text-label tracking-label';
       {/* Smaller on phones so the answers fit below it. A fixed size, not one tied to screen height, so it
         doesn't change when the on-screen keyboard opens. */}
       <img
-        data-flag
+        data-picture
         alt=""
         width="640"
         height="480"
@@ -167,6 +174,6 @@ const label = 'font-terminal text-label tracking-label';
       </div>
     </section>
 
-    <QuizSettings unit={quiz.unit} modes={quiz.modes} summary={summary} />
+    <QuizSettings unit={quiz.unit} modes={quiz.modes} summary={summary} countries={quiz.countries} />
   </div>
 </Window>
