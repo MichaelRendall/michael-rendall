@@ -6,7 +6,7 @@ A personal site for games, quizzes and small tools, with a pastel vaporwave look
 
 ```
 src/
-  pages/          index.astro, plus quizzes/: index.astro (the hub) and one file per quiz
+  pages/          index.astro, plus quizzes/ and games/: each an index.astro hub and one file per quiz or game
   layouts/        BaseLayout.astro: <head>, scene, header and footer shared by every page
   components/     Scene (the beach SVG), Backdrop, SiteHeader, SiteFooter, Window,
                   TitleBar, Button, Icon, QuizCard
@@ -16,11 +16,14 @@ src/
                   capitals.ts: capitals and the cities offered as wrong answers
                   country-stats.ts: population, GDP, area and highest points (generated, see tools/)
                   flag-urls.ts, shape-urls.ts: build-time maps of country code to flag and outline files
-                  shapes.ts: countries left out of the shapes quiz
+                  shapes.ts: how island nations are drawn, and countries left out of the shapes quiz
+                  quizzes.ts, games.ts: the cards on the two hub pages
+                  charades-prompts.ts: the charades prompts, by category and difficulty
   scripts/        main.ts: footer clock (Glasgow time) and year
                   quiz/: the shared quiz engine, settings and answer matching, plus one
                   definition per quiz (flags.ts, capitals.ts, shapes.ts)
                   higher-lower/: the higher-or-lower game and its categories
+                  charades/: the charades game and its settings
                   settings-dialog.ts: client side of the shared settings pop-up
   styles/         global.css: Tailwind, fonts, colour and shadow tokens
 public/           Files copied to the site root unchanged (favicons, robots.txt, images)
@@ -64,6 +67,8 @@ Vercel builds the site on every push to the connected Git repository. Production
 - **Update the higher-or-lower figures:** run `node tools/fetch-country-stats.mjs`. It downloads the latest World Bank and Wikidata figures and rewrites `src/data/country-stats.ts`, then lists any gaps. Review the diff before committing.
 - **Redraw the country outlines:** run `node tools/make-shapes.mjs`. It downloads Natural Earth's country boundaries once (cached in `tools/.cache/`), redraws `src/assets/shapes/` and reports what it left out. To leave a country out of the shapes quiz, add it to `src/data/shapes.ts` and rerun.
 - **Add a higher-or-lower category:** add a field to the script, rerun it, and add an entry in `src/scripts/higher-lower/categories.ts`.
+- **Edit the charades prompts:** edit `src/data/charades-prompts.ts`. Categories and difficulty levels are lists there; the game picks up any changes.
+- **Add a game:** create `src/pages/games/<name>.astro` wrapped in `<BaseLayout page="games">`, then add a card in `src/data/games.ts` with `href: '/games/<name>'`.
 - **Add a page:** create `src/pages/<name>.astro` and wrap it in `<BaseLayout>`. It's served at `/<name>` (Vercel's `cleanUrls`). Add a link in `SiteHeader.astro`, and add the page to `BaseLayout`'s `page` prop type.
 - **Change colours or fonts:** edit the `@theme` block in `src/styles/global.css`. Every `bg-*`, `text-*`, `border-*` and `shadow-*` class picks up the change.
 - **Change the favicon:** edit `public/favicon.svg`. Modern browsers use it directly. `favicon.ico` (for older browsers) and `apple-touch-icon.png` (for iOS home screens) are PNG renders of it, so export new copies at 32px and 180px when the SVG changes.

@@ -1,38 +1,39 @@
 ---
-import type { Quiz } from '../data/quizzes';
+import type { HubCard } from '../data/cards';
 import Button from './Button.astro';
 import Icon from './Icon.astro';
 import TitleBar from './TitleBar.astro';
 
+// A card on a hub page (Quizzes, Games): title bar, icon panel, name, summary, and Play or "Coming soon".
 interface Props {
-  quiz: Quiz;
+  card: HubCard;
 }
 
-const { quiz } = Astro.props;
+const { card } = Astro.props;
 const shadows = { mint: '', pink: 'shadow-pink', lilac: 'shadow-lilac' };
-const [from, to] = quiz.previewColours;
+const [from, to] = card.previewColours;
 ---
 
 <article
   data-anim="intro"
-  class:list={['flex flex-col border-2 border-ink bg-paper shadow-hard-8', shadows[quiz.shadow]]}
+  class:list={['flex flex-col border-2 border-ink bg-paper shadow-hard-8', shadows[card.shadow]]}
 >
   <TitleBar size="sm" controls={2}>
-    <span class="font-terminal text-label">{quiz.file}</span>
+    <span class="font-terminal text-label">{card.file}</span>
   </TitleBar>
   <div
     class="flex h-36 items-center justify-center border-b-2 border-ink bg-linear-135/srgb from-(--from) to-(--to)"
     style={{ '--from': from, '--to': to }}
   >
-    <Icon name={quiz.icon} size="xl" strokeWidth={1.6} />
+    <Icon name={card.icon} size="xl" strokeWidth={1.6} />
   </div>
   <div class="flex grow flex-col gap-3 p-5.5">
-    <h2 class="font-pixel text-title leading-[1.15] font-bold">{quiz.name}</h2>
-    <p class="text-body leading-[1.55] text-ink-soft">{quiz.summary}</p>
+    <h2 class="font-pixel text-title leading-[1.15] font-bold">{card.name}</h2>
+    <p class="text-body leading-[1.55] text-ink-soft">{card.summary}</p>
     <div class="mt-auto pt-1.5">
-      {quiz.href ? (
-        <Button href={quiz.href} icon="play">
-          Play<span class="sr-only"> {quiz.name}</span>
+      {card.href ? (
+        <Button href={card.href} icon="play">
+          Play<span class="sr-only"> {card.name}</span>
         </Button>
       ) : (
         <span class="inline-flex min-h-12 items-center border-2 border-dashed border-ink px-4 font-terminal text-label tracking-label text-ink-soft">

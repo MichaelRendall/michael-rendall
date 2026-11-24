@@ -1,5 +1,6 @@
 // Client side of the shared settings pop-up (src/components/settings/). Opens and closes it, runs
-// Select all and Clear, and enforces "at least one continent". Each game supplies what a change means.
+// Select all and Clear, and enforces "at least one" in the required group (continents, or Charades'
+// categories). Each game supplies what a change means.
 
 /** One summary tag. Shared with SummaryTags.astro, which draws the first version at build time. */
 export const SUMMARY_TAG_CLASS = 'bg-lilac-mist px-2 py-0.5 font-terminal text-label tracking-label text-ink';
@@ -63,12 +64,17 @@ export function setChecked(form: HTMLFormElement, name: string, values: readonly
 interface Hooks {
   /** The form changed: read it, save it if valid, update the page. */
   onChange(): void;
-  /** Closed with no continent picked: put the last saved settings back in the form. */
+  /** Closed with nothing picked in the required group: put the last saved settings back in the form. */
   onRevert(): void;
 }
 
 /** Wires up the pop-up inside `root`. Returns `refresh`, to call after setting the form from code. */
-export function wireSettingsDialog(root: HTMLElement, hooks: Hooks): { refresh(): void } {
+export function wireSettingsDialog(
+  root: HTMLElement,
+  hooks: Hooks,
+  /** The checkbox group that needs at least one pick, and has Select all and Clear. */
+  required = 'continent',
+): { refresh(): void } {
   const $ = <T extends HTMLElement>(sel: string): T => {
     const el = root.querySelector<T>(sel);
     if (!el) throw new Error(`Settings: missing ${sel}`);
@@ -78,11 +84,11 @@ export function wireSettingsDialog(root: HTMLElement, hooks: Hooks): { refresh()
   const form = $<HTMLFormElement>('[data-settings]');
   const selectAllBtn = $<HTMLButtonElement>('[data-select-all]');
   const clearBtn = $<HTMLButtonElement>('[data-clear]');
-  const continentInputs = form.querySelectorAll<HTMLInputElement>('input[name="continent"]');
-  const picked = (): number => Array.from(continentInputs).filter((el) => el.checked).length;
+  const requiredInputs = form.querySelectorAll<HTMLInputElement>(`input[name="${required}"]`);
+  const picked = (): number => Array.from(requiredInputs).filter((el) => el.checked).length;
 
   function refresh(): void {
-    selectAllBtn.disabled = picked() === continentInputs.length;
+    selectAllBtn.disabled = picked() === requiredInputs.length;
     clearBtn.disabled = picked() === 0;
   }
 
@@ -92,9 +98,9 @@ export function wireSettingsDialog(root: HTMLElement, hooks: Hooks): { refresh()
   }
 
   const setAll = (checked: boolean): void => {
-    continentInputs.forEach((el) => (el.checked = checked));
+    requiredInputs.forEach((el) => (el.checked = checked));
     changed();
-    continentInputs[0]?.focus();
+    requiredInputs[0]?.focus();
   };
 
   root.querySelectorAll('[data-open-settings]').forEach((el) =>
@@ -106,11 +112,11 @@ export function wireSettingsDialog(root: HTMLElement, hooks: Hooks): { refresh()
   form.addEventListener('change', changed);
   selectAllBtn.addEventListener('click', () => setAll(true));
   clearBtn.addEventListener('click', () => setAll(false));
-  // "Done" needs a continent picked. Closing any other way (Escape, the × button) goes back to the last saved settings.
+  // "Done" needs something picked. Closing any other way (Escape, the × button) goes back to the last saved settings.
   form.addEventListener('submit', (event) => {
     if (picked()) return;
     event.preventDefault();
-    continentInputs[0]?.focus();
+    requiredInputs[0]?.focus();
   });
   $('[data-settings-close]').addEventListener('click', () => dialog.close());
   dialog.addEventListener('close', () => {
