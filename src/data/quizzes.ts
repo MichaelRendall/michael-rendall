@@ -35,6 +35,15 @@ export const quizzes: Quiz[] = [
     href: '/quizzes/capitals',
   },
   {
+    file: 'shapes.exe',
+    name: 'Shapes',
+    summary: 'Name the country from its outline. Type it or pick from four.',
+    icon: 'shape',
+    previewColours: ['#ffe0ef', '#c9f5f1'],
+    shadow: 'mint',
+    href: '/quizzes/shapes',
+  },
+  {
     file: 'higher_lower.exe',
     name: 'Higher or lower',
     summary: 'Is the next country higher or lower? Population, GDP, area or highest point. Keep the streak going.',

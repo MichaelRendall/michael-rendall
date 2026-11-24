@@ -1,0 +1,23 @@
+---
+// The current settings as small tags: "10 flags" "Europe" "Typing". Each tag is one setting and wraps as a
+// whole. Flat, with no border, because only clickable things get borders on this site. The game's script
+// redraws it with renderSummary() (src/scripts/settings-dialog.ts), using the same classes.
+import { SUMMARY_TAG_CLASS } from '../../scripts/settings-dialog';
+
+interface Props {
+  parts: string[];
+  /** Announce changes to screen readers: for the copy inside the settings pop-up. */
+  live?: boolean;
+}
+
+const { parts, live = false } = Astro.props;
+---
+
+<p data-summary aria-live={live ? 'polite' : undefined} class="flex flex-wrap gap-1.5">
+  {parts.map((part, i) => (
+    <>
+      {i > 0 && <span class="sr-only">, </span>}
+      <span class={SUMMARY_TAG_CLASS}>{part}</span>
+    </>
+  ))}
+</p>

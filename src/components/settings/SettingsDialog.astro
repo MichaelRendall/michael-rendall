@@ -3,10 +3,11 @@
 // a live summary line and Done. src/scripts/settings-dialog.ts wires it up.
 import Button from '../Button.astro';
 import TitleBar from '../TitleBar.astro';
+import SummaryTags from './SummaryTags.astro';
 
 interface Props {
-  /** The summary line for the default settings, kept up to date by the game's script. */
-  summary: string;
+  /** The summary tags for the default settings, kept up to date by the game's script. */
+  summary: string[];
 }
 
 const { summary } = Astro.props;
@@ -33,9 +34,7 @@ const { summary } = Astro.props;
   </TitleBar>
   <form data-settings method="dialog" class="flex flex-col items-start gap-5 p-[clamp(1.25rem,2.5vw,1.75rem)]">
     <slot />
-    <p data-summary aria-live="polite" class="font-terminal text-label tracking-label">
-      {summary}
-    </p>
+    <SummaryTags parts={summary} live />
     <Button type="submit">Done</Button>
   </form>
 </dialog>

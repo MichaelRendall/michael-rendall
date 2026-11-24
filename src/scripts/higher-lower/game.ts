@@ -1,7 +1,7 @@
 // Higher or lower: is the next country's figure higher or lower than the current one's? An endless
 // streak that ends at the first wrong answer. Markup: src/pages/quizzes/higher-lower.astro.
 import { continents, countries, nameInSentence, type Continent, type Country } from '../../data/countries';
-import { checkedValues, setChecked, wireSettingsDialog } from '../settings-dialog';
+import { checkedValues, renderBest, renderSummary, setChecked, wireSettingsDialog } from '../settings-dialog';
 import { CATEGORIES, CATEGORY_IDS, type CategoryId } from './categories';
 
 /** How long a right answer's figure stays on screen before the next pair, in ms. */
@@ -135,21 +135,24 @@ export function initHigherLower(root: HTMLElement): void {
     };
   }
 
-  /** "Population · all continents" or "Area · Europe and Asia (93 countries) · close calls". */
-  function describe(): string {
+  /** The summary tags: ["Population", "All continents"], ["Area", "Europe and Asia", "Close calls"]. */
+  function describe(): string[] {
     const everywhere = settings.continents.length === continents.length;
-    const where = everywhere
-      ? 'all continents'
-      : `${listFormat.format(settings.continents)} (${pool().length} countries)`;
-    return [category().label, where, ...(settings.difficulty === 'close' ? ['close calls'] : [])].join(' · ');
+    return [
+      category().label,
+      everywhere ? 'All continents' : listFormat.format(settings.continents),
+      ...(settings.difficulty === 'close' ? ['Close calls'] : []),
+    ];
   }
 
   function updateSummary(): void {
     const none = settings.continents.length === 0;
-    summaryEls.forEach((el) => (el.textContent = none ? 'Pick at least one continent.' : describe()));
+    summaryEls.forEach((el) => renderSummary(el, none ? 'Pick at least one continent.' : describe()));
     const best = none ? null : readBest(settings);
-    bestEl.hidden = best === null;
-    bestEl.textContent = best === null ? '' : `Your best streak with these settings: ${best}`;
+    renderBest(
+      bestEl,
+      best === null ? null : { shown: `Best streak ${best}`, spoken: `Your best streak with these settings: ${best}` },
+    );
   }
 
   // Game
@@ -268,7 +271,14 @@ export function initHigherLower(root: HTMLElement): void {
     if (isBest) save(bestKey(settings), String(streak));
 
     resultTitle.textContent = streak === 0 ? 'No streak this time' : `You got ${streak} in a row`;
-    resultBest.textContent = isBest ? '✦ New best streak! ✦' : previous ? `Your best: ${previous}` : '';
+    renderBest(
+      resultBest,
+      isBest
+        ? { shown: 'New best streak!', spoken: 'New best streak!' }
+        : previous
+          ? { shown: `Best streak ${previous}`, spoken: `Your best streak: ${previous}` }
+          : null,
+    );
     resultLast.textContent =
       left && right
         ? `Last pair: ${left.name}, ${category().format(valueOf(left))} · ${right.name}, ${category().format(valueOf(right))}`

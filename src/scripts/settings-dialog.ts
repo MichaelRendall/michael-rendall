@@ -1,6 +1,54 @@
 // Client side of the shared settings pop-up (src/components/settings/). Opens and closes it, runs
 // Select all and Clear, and enforces "at least one continent". Each game supplies what a change means.
 
+/** One summary tag. Shared with SummaryTags.astro, which draws the first version at build time. */
+export const SUMMARY_TAG_CLASS = 'bg-lilac-mist px-2 py-0.5 font-terminal text-label tracking-label text-ink';
+
+/**
+ * Redraws a summary (src/components/settings/SummaryTags.astro) as tags, one per setting, with hidden
+ * commas so screen readers hear a list. A plain string, such as a warning, is shown as text.
+ */
+export function renderSummary(el: HTMLElement, parts: string[] | string): void {
+  if (typeof parts === 'string') {
+    el.textContent = parts;
+    return;
+  }
+  el.replaceChildren(
+    ...parts.flatMap((part, i) => {
+      const tag = document.createElement('span');
+      tag.className = SUMMARY_TAG_CLASS;
+      tag.textContent = part;
+      if (i === 0) return [tag];
+      const comma = document.createElement('span');
+      comma.className = 'sr-only';
+      comma.textContent = ', ';
+      return [comma, tag];
+    }),
+  );
+}
+
+/** The best-score tag: like a summary tag, in mint, so it reads as your score rather than a setting. */
+export const BEST_TAG_CLASS = 'self-start bg-mint-mist px-2 py-0.5 font-terminal text-label tracking-label text-ink';
+
+/**
+ * Shows a best score as a short tag ("Best 5 / 46") while screen readers hear the full sentence
+ * ("Your best with these settings: 5 out of 46"). Hidden when there's no best yet.
+ */
+export function renderBest(el: HTMLElement, best: { shown: string; spoken: string } | null): void {
+  el.hidden = best === null;
+  if (!best) {
+    el.replaceChildren();
+    return;
+  }
+  const shown = document.createElement('span');
+  shown.setAttribute('aria-hidden', 'true');
+  shown.textContent = best.shown;
+  const spoken = document.createElement('span');
+  spoken.className = 'sr-only';
+  spoken.textContent = best.spoken;
+  el.replaceChildren(shown, spoken);
+}
+
 export const checkedValues = (form: HTMLFormElement, name: string): string[] =>
   Array.from(form.querySelectorAll<HTMLInputElement>(`input[name="${name}"]`))
     .filter((el) => el.checked)

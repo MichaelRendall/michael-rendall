@@ -13,6 +13,8 @@ export const MODE_LABELS: Record<Mode, string> = { type: 'Typing', choice: 'Mult
 export interface QuizDefinition {
   /** Prefix for this quiz's saved settings and best scores, e.g. "flags". */
   id: string;
+  /** The countries this quiz uses, if not all of them (the shapes quiz leaves some out). */
+  countries?: readonly Country[];
   /** Plural noun for the summary and settings, e.g. "flags" in "10 flags from all continents". */
   unit: string;
   /** Word before the progress count, e.g. "Flag" in "Flag 3 of 10". */
@@ -25,7 +27,8 @@ export interface QuizDefinition {
   missedHeading: string;
   /** The question for a country, e.g. "What's the capital of Peru?". */
   question(country: Country): string;
-  flagAlt(country: Country): string;
+  /** Alt text for the question's picture: the flag, or the country's shape. */
+  imageAlt(country: Country): string;
   /** The right answer as shown in feedback, e.g. "Lima". */
   answer(country: Country): string;
   /** Type mode: whether the text typed so far is right. */

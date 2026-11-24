@@ -20,13 +20,13 @@ export const defaultSettings = (modes: readonly Mode[]): Settings => ({
   mode: modes[0],
 });
 
-/** The countries a game can draw from. */
-export const poolFor = (settings: Settings): Country[] =>
-  countries.filter((country) => settings.continents.includes(country.continent));
+/** The countries a game can draw from: the quiz's own list (all countries by default), on the chosen continents. */
+export const poolFor = (settings: Settings, base: readonly Country[] = countries): Country[] =>
+  base.filter((country) => settings.continents.includes(country.continent));
 
 /** Questions in a game: the chosen length, or fewer if the filter leaves fewer countries. */
-export function totalFor(settings: Settings): number {
-  const available = poolFor(settings).length;
+export function totalFor(settings: Settings, base: readonly Country[] = countries): number {
+  const available = poolFor(settings, base).length;
   return settings.length === 'all' ? available : Math.min(settings.length, available);
 }
 
@@ -56,21 +56,26 @@ export function saveSettings(quizId: string, settings: Settings): void {
  * Best scores are kept per combination of mode, game size and continents: 8 out of 10 by multiple choice
  * on Europe isn't comparable with 8 out of 10 typed on the whole world.
  */
-const bestKey = (quizId: string, settings: Settings): string =>
-  `${quizId}:best:${settings.mode}:${totalFor(settings)}:${[...settings.continents].sort().join(',')}`;
+const bestKey = (quizId: string, settings: Settings, base: readonly Country[]): string =>
+  `${quizId}:best:${settings.mode}:${totalFor(settings, base)}:${[...settings.continents].sort().join(',')}`;
 
-export function readBest(quizId: string, settings: Settings): number | null {
+export function readBest(quizId: string, settings: Settings, base: readonly Country[] = countries): number | null {
   try {
-    const value = Number(localStorage.getItem(bestKey(quizId, settings)));
+    const value = Number(localStorage.getItem(bestKey(quizId, settings, base)));
     return Number.isInteger(value) && value > 0 ? value : null;
   } catch {
     return null;
   }
 }
 
-export function saveBest(quizId: string, settings: Settings, score: number): void {
+export function saveBest(
+  quizId: string,
+  settings: Settings,
+  score: number,
+  base: readonly Country[] = countries,
+): void {
   try {
-    localStorage.setItem(bestKey(quizId, settings), String(score));
+    localStorage.setItem(bestKey(quizId, settings, base), String(score));
   } catch {
     // Not saved; the game still works.
   }
