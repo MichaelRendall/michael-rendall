@@ -13,6 +13,11 @@ interface Props extends Omit<HTMLAttributes<'button'>, 'class'> {
   current?: boolean;
   /** Opens the link in a new tab, and tells screen reader users it will. */
   newTab?: boolean;
+  /**
+   * Nav only: keep the icon on phones. Nav buttons drop their icons on phones to fit on one row; Home
+   * keeps its icon and hides its label instead (see SiteHeader).
+   */
+  iconOnPhones?: boolean;
 }
 
 const {
@@ -22,12 +27,17 @@ const {
   icon,
   current = false,
   newTab = false,
+  iconOnPhones = false,
   type = 'button',
   ...attrs
 } = Astro.props;
 
 const looks = {
-  nav: ['font-terminal text-label-lg tracking-label', current ? 'bg-mint-light shadow-pink' : 'bg-paper'],
+  // On phones, nav buttons are tighter so all three fit on one row.
+  nav: [
+    'font-terminal text-label-lg tracking-label max-sm:px-3 max-sm:text-label',
+    current ? 'bg-mint-light shadow-pink' : 'bg-paper',
+  ],
   primary: ['bg-pink-light font-semibold', size === 'lg' ? 'text-body' : 'text-body-sm'],
   secondary: ['bg-mint-pale shadow-pink font-semibold', size === 'lg' ? 'text-body' : 'text-body-sm'],
 };
@@ -53,7 +63,11 @@ const classes = [
     rel={newTab ? 'noopener noreferrer' : undefined}
     class:list={classes}
   >
-    {icon && <Icon name={icon} size={iconSize} />}
+    {icon && (
+      <span class:list={['inline-flex', variant === 'nav' && !iconOnPhones && 'max-sm:hidden']}>
+        <Icon name={icon} size={iconSize} />
+      </span>
+    )}
     <slot />
     {newTab && <span class="sr-only"> (opens in a new tab)</span>}
   </a>

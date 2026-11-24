@@ -1,7 +1,6 @@
 ---
 // The continent filter every game shares, with Select all and Clear.
-import ChipGroup from './ChipGroup.astro';
-import TextButton from '../TextButton.astro';
+import PickSeveralField from './PickSeveralField.astro';
 import { continents, countries as allCountries, type Country } from '../../data/countries';
 
 interface Props {
@@ -17,9 +16,4 @@ const options = continents.map((continent) => ({
 }));
 ---
 
-<ChipGroup legend="Continents" name="continent" type="checkbox" options={options} checked={[...continents]}>
-  <div class="mt-1 flex gap-4">
-    <TextButton data-select-all>Select all</TextButton>
-    <TextButton data-clear>Clear</TextButton>
-  </div>
-</ChipGroup>
+<PickSeveralField legend="Continents" name="continent" options={options} />

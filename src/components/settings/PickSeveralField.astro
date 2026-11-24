@@ -1,0 +1,21 @@
+---
+// A settings group where several options can be picked and at least one must be, with Select all and
+// Clear. src/scripts/settings-dialog.ts enforces the "at least one" (pass this field's `name` as `required`).
+import ChipGroup from './ChipGroup.astro';
+import TextButton from '../TextButton.astro';
+
+interface Props {
+  legend: string;
+  name: string;
+  options: { value: string; label: string; note?: string }[];
+}
+
+const { legend, name, options } = Astro.props;
+---
+
+<ChipGroup legend={legend} name={name} type="checkbox" options={options} checked={options.map((o) => o.value)}>
+  <div class="mt-1 flex gap-4">
+    <TextButton data-select-all>Select all</TextButton>
+    <TextButton data-clear>Clear</TextButton>
+  </div>
+</ChipGroup>

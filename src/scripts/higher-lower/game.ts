@@ -111,7 +111,8 @@ export function initHigherLower(root: HTMLElement): void {
   const show = (name: keyof typeof screens): void => {
     for (const [key, el] of Object.entries(screens)) el.hidden = key !== name;
   };
-  const listFormat = new Intl.ListFormat('en-GB', { type: 'conjunction' });
+  // US English formatting for its Oxford comma ("Europe, Asia, and Africa"); the en-GB format leaves it out.
+  const listFormat = new Intl.ListFormat('en-US', { type: 'conjunction' });
 
   /** The countries this game can use: on the chosen continents and with a figure for the category. */
   const pool = (): Country[] =>

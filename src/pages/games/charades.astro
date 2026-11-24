@@ -1,0 +1,256 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Button from '../../components/Button.astro';
+import TextButton from '../../components/TextButton.astro';
+import Window from '../../components/Window.astro';
+import ChipGroup from '../../components/settings/ChipGroup.astro';
+import PickSeveralField from '../../components/settings/PickSeveralField.astro';
+import SettingsDialog from '../../components/settings/SettingsDialog.astro';
+import SummaryTags from '../../components/settings/SummaryTags.astro';
+import { CATEGORIES, CATEGORY_LABELS, prompts } from '../../data/charades-prompts';
+import {
+  DEFAULT_SETTINGS,
+  DEFAULT_TEAM_NAMES,
+  LEVEL_LABELS,
+  LEVEL_OPTIONS,
+  ROUND_OPTIONS,
+  SECONDS_OPTIONS,
+  TEAM_NAME_MAX,
+  TEAM_OPTIONS,
+  describe,
+  secondsLabel,
+} from '../../scripts/charades/settings';
+
+const label = 'font-terminal text-label tracking-label';
+const heading = 'font-pixel text-label-xl font-bold focus:outline-none';
+const summary = describe(DEFAULT_SETTINGS);
+const promptCount = (category: (typeof CATEGORIES)[number]): number =>
+  Object.values(prompts[category]).reduce((sum, list) => sum + list.length, 0);
+const scoreboard = 'flex w-full max-w-80 flex-col gap-1 text-body';
+---
+
+<BaseLayout
+  page="games"
+  title="Charades, Michael Rendall"
+  description="Act it out, no talking. A charades game for teams."
+>
+  <Window
+    as="main"
+    id="main"
+    title="charades.exe"
+    aria-labelledby="game-title"
+    class="mx-auto w-full max-w-136 shadow-hard-8"
+  >
+    <div data-charades class="flex flex-col gap-4 p-[clamp(1.25rem,2.5vw,1.75rem)]">
+      <h1
+        id="game-title"
+        class="text-chrome font-pixel text-[clamp(1.75rem,1.25rem+1.5vw,2.5rem)] leading-[1.08] font-bold"
+      >
+        Charades
+      </h1>
+
+      <section data-screen="start" class="flex flex-col items-start gap-3">
+        <p class="text-body leading-[1.6] text-ink-soft">
+          Act out the prompt without speaking while your team guesses. Most points after every round wins.
+        </p>
+        <SummaryTags parts={summary} />
+        <div class="flex flex-wrap gap-2.5">
+          <Button data-start icon="play">
+            Start game
+          </Button>
+          <Button data-open-settings variant="secondary" icon="sliders">
+            Settings
+          </Button>
+        </div>
+        <noscript>
+          <p class="text-body">The game needs JavaScript to run.</p>
+        </noscript>
+      </section>
+
+      <section data-screen="turn" hidden class="flex flex-col items-start gap-3">
+        <h2 data-turn-title tabindex="-1" class={heading}>
+          Team A's turn
+        </h2>
+        <p data-turn-round class={label}>
+          Round 1
+        </p>
+        <p class="text-body text-ink-soft">Pass the device to the actor. Everyone else, no peeking.</p>
+        <ol data-scoreboard class={scoreboard} aria-label="Scores"></ol>
+        <div class="flex w-full flex-wrap items-center justify-between gap-2.5">
+          <Button data-ready size="lg" icon="play">
+            Start round
+          </Button>
+          <TextButton data-end-game size="md">
+            End game
+          </TextButton>
+        </div>
+      </section>
+
+      <section data-screen="act" hidden class="flex flex-col gap-4">
+        <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+          <p data-act-team class={label}>
+            Team A · Round 1
+          </p>
+          <TextButton data-end-round size="md">
+            End round
+          </TextButton>
+        </div>
+        <div class="flex items-center gap-3">
+          <div data-timer-track class="h-3 grow border-2 border-ink bg-paper" aria-hidden="true">
+            <div data-timer-bar class="h-full w-full bg-teal"></div>
+          </div>
+          <p data-timer class="font-terminal text-label-xl tabular-nums" aria-hidden="true">
+            1:00
+          </p>
+        </div>
+        {/* Screen readers only: the 10-second warning and time's up, not every second. */}
+        <p data-announce aria-live="assertive" class="sr-only"></p>
+        <div class="flex min-h-48 flex-col items-center justify-center gap-3 border-2 border-ink bg-paper px-4 py-6 text-center shadow-hard-4 shadow-lilac">
+          <p data-category class="bg-lilac-mist px-2 py-0.5 font-terminal text-label tracking-label">
+            Films
+          </p>
+          <p
+            data-prompt
+            tabindex="-1"
+            aria-live="polite"
+            class="text-[clamp(1.75rem,1.25rem+2vw,2.75rem)] leading-tight font-bold focus:outline-none"
+          ></p>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <Button data-got size="lg">
+            ✓ Got it
+          </Button>
+          <Button data-skip size="lg" variant="secondary">
+            Skip
+          </Button>
+        </div>
+      </section>
+
+      <section data-screen="buzzer" hidden class="flex flex-col items-start gap-3">
+        <h2 data-buzzer-title tabindex="-1" class={heading}>
+          Time's up!
+        </h2>
+        <p class="text-body">
+          The last one was <strong data-last-prompt></strong>. Did they get it?
+        </p>
+        <p class="text-body-sm text-ink-soft">
+          Points so far this round: <span data-round-score>0</span>
+        </p>
+        <div class="flex flex-wrap gap-2.5">
+          <Button data-last-yes size="lg">
+            Yes, they got it
+          </Button>
+          <Button data-last-no size="lg" variant="secondary">
+            No
+          </Button>
+        </div>
+      </section>
+
+      <section data-screen="summary" hidden class="flex flex-col items-start gap-3">
+        <h2 data-summary-title tabindex="-1" class={heading}>
+          Team A got 0 points
+        </h2>
+        <ul data-got-list class="flex flex-col gap-0.5 text-body" aria-label="Guessed"></ul>
+        <div data-skipped-wrap class="flex flex-col gap-1">
+          <h3 class={label}>Skipped</h3>
+          <ul data-skipped-list class="flex flex-col gap-0.5 text-body text-ink-soft"></ul>
+        </div>
+        <ol data-scoreboard class={scoreboard} aria-label="Scores"></ol>
+        <Button data-next-turn size="lg">
+          Next
+        </Button>
+      </section>
+
+      <section data-screen="final" hidden class="flex flex-col items-start gap-3">
+        <h2 data-final-title tabindex="-1" class={heading}>
+          Results
+        </h2>
+        <ol data-scoreboard class={scoreboard} aria-label="Final scores"></ol>
+        <div class="flex flex-wrap gap-2.5">
+          <Button data-again icon="play">
+            Play again
+          </Button>
+          <Button data-open-settings variant="secondary" icon="sliders">
+            Settings
+          </Button>
+        </div>
+      </section>
+
+      <SettingsDialog summary={summary}>
+        <PickSeveralField
+          legend="Categories"
+          name="category"
+          options={CATEGORIES.map((c) => ({ value: c, label: CATEGORY_LABELS[c], note: String(promptCount(c)) }))}
+        />
+        <ChipGroup
+          legend="Difficulty"
+          name="level"
+          type="radio"
+          options={LEVEL_OPTIONS.map((o) => ({ value: o, label: LEVEL_LABELS[o] }))}
+          checked={[DEFAULT_SETTINGS.level]}
+        />
+        <ChipGroup
+          legend="Round length"
+          name="seconds"
+          type="radio"
+          options={SECONDS_OPTIONS.map((s) => ({ value: String(s), label: secondsLabel(s) }))}
+          checked={[String(DEFAULT_SETTINGS.seconds)]}
+        />
+        <ChipGroup
+          legend="Teams"
+          name="teams"
+          type="radio"
+          options={TEAM_OPTIONS.map((t) => ({ value: String(t), label: String(t) }))}
+          checked={[String(DEFAULT_SETTINGS.teams)]}
+        />
+        <fieldset class="flex w-full flex-col gap-1.5">
+          <legend class="mb-1.5 font-terminal text-label tracking-label">Team names</legend>
+          <div class="grid w-full gap-2 sm:grid-cols-2">
+            {DEFAULT_TEAM_NAMES.map((name, i) => (
+              <label data-team-field class="flex flex-col gap-1 font-terminal text-label-sm tracking-label">
+                Team {i + 1}
+                <input
+                  name="team-name"
+                  type="text"
+                  maxlength={TEAM_NAME_MAX}
+                  placeholder={name}
+                  autocomplete="off"
+                  spellcheck="false"
+                  data-1p-ignore
+                  data-lpignore="true"
+                  data-bwignore
+                  data-form-type="other"
+                  class="min-h-10 border-2 border-ink bg-white px-2 font-sans text-body tracking-normal text-ink placeholder:text-ink-soft focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-violet"
+                />
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <ChipGroup
+          legend="Rounds each"
+          name="rounds"
+          type="radio"
+          options={ROUND_OPTIONS.map((r) => ({ value: String(r), label: String(r) }))}
+          checked={[String(DEFAULT_SETTINGS.rounds)]}
+        />
+        <ChipGroup
+          legend="Sound"
+          name="sound"
+          type="radio"
+          options={[
+            { value: 'on', label: 'On' },
+            { value: 'off', label: 'Off' },
+          ]}
+          checked={['on']}
+        />
+      </SettingsDialog>
+    </div>
+  </Window>
+</BaseLayout>
+
+<script>
+  import { initCharades } from '../../scripts/charades/game';
+
+  const root = document.querySelector<HTMLElement>('[data-charades]');
+  if (root) initCharades(root);
+</script>

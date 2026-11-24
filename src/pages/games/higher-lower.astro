@@ -18,14 +18,14 @@ const summary = [CATEGORIES[DEFAULT_SETTINGS.category].label, 'All continents'];
 const retrieved = new Date(RETRIEVED).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 // One string, so line wrapping in the markup can't swallow the space before the date.
 // Kept short and small. Which source covers what is noted in src/data/country-stats.ts.
-const credit = `Data: World Bank, IMF and Wikidata, ${retrieved}.`;
+const credit = `Data: World Bank, IMF, and Wikidata, ${retrieved}.`;
 const sides = ['left', 'right'] as const;
 ---
 
 <BaseLayout
-  page="quizzes"
+  page="games"
   title="Higher or lower, Michael Rendall"
-  description="Is the next country's population, GDP, area or highest point higher or lower? Keep the streak going."
+  description="Is the next country's population, GDP, area, or highest point higher or lower? Keep the streak going."
 >
   <Window
     as="main"

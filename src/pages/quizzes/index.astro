@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import QuizCard from '../../components/QuizCard.astro';
+import HubCard from '../../components/HubCard.astro';
 import Window from '../../components/Window.astro';
 import { quizzes } from '../../data/quizzes';
 ---
@@ -18,7 +18,7 @@ import { quizzes } from '../../data/quizzes';
 
     <section aria-label="All quizzes" class="grid gap-8 sm:grid-cols-2">
       {quizzes.map((quiz) => (
-        <QuizCard quiz={quiz} />
+        <HubCard card={quiz} />
       ))}
     </section>
   </main>
