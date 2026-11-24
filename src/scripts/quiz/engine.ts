@@ -9,6 +9,7 @@
 // Either way the game ends when every question is done, or when the player gives up.
 import { continents, countries, type Country } from '../../data/countries';
 import { MODE_LABELS, shuffle, type Mode, type QuizDefinition } from './definition';
+import { GameClock, formatClock } from './clock';
 import {
   defaultSettings,
   LENGTHS,
@@ -16,6 +17,10 @@ import {
   poolFor,
   readBest,
   saveBest,
+  beats,
+  countdownSeconds,
+  TIMERS,
+  TIMER_LABELS,
   saveSettings,
   totalFor,
   type Settings,
@@ -55,6 +60,11 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
   const roundEl = $('[data-round]');
   const totalEl = $('[data-total]');
   const scoreEl = $('[data-score]');
+  const clockWrap = $('[data-clock-wrap]');
+  const clockEl = $('[data-clock]');
+  const clockTrack = $('[data-clock-track]');
+  const clockBar = $('[data-clock-bar]');
+  const clockAnnounce = $('[data-clock-announce]');
   const pictureImg = $<HTMLImageElement>('[data-picture]');
   const questionEl = $('[data-question]');
   const announceEl = $('[data-announce]');
@@ -80,6 +90,11 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
   let picks = new Map<number, string>();
   let current = 0;
   let advanceTimer: number | undefined;
+  /** Set when a countdown runs out, so the results say so. */
+  let timedOut = false;
+  /** Set when the clock paused because the page was hidden, so it resumes on return. */
+  let pausedWhileHidden = false;
+  let announced = new Set<number>();
 
   const show = (name: keyof typeof screens): void => {
     for (const [key, el] of Object.entries(screens)) el.hidden = key !== name;
@@ -97,17 +112,20 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
     setChecked(settingsForm, 'length', [String(settings.length)]);
     setChecked(settingsForm, 'continent', settings.continents);
     setChecked(settingsForm, 'mode', [settings.mode]);
+    setChecked(settingsForm, 'timer', [settings.timer]);
   }
 
   function readSettingsForm(): Settings {
     const defaults = defaultSettings(quiz.modes);
     const [length] = checkedValues(settingsForm, 'length');
     const [mode] = checkedValues(settingsForm, 'mode');
+    const [timer] = checkedValues(settingsForm, 'timer');
     const picked = checkedValues(settingsForm, 'continent');
     return {
       length: LENGTHS.find((option) => String(option) === length) ?? defaults.length,
       continents: continents.filter((c) => picked.includes(c)),
       mode: quiz.modes.find((option) => option === mode) ?? defaults.mode,
+      timer: TIMERS.find((option) => option === timer) ?? defaults.timer,
     };
   }
 
@@ -128,6 +146,7 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
       total === poolFor(settings, base).length ? `All ${total} ${quiz.unit}` : `${total} ${quiz.unit}`,
       everywhere ? 'All continents' : listFormat.format(settings.continents),
       ...(quiz.modes.length > 1 ? [MODE_LABELS[settings.mode]] : []),
+      ...(settings.timer === 'off' ? [] : [TIMER_LABELS[settings.timer]]),
     ];
   }
 
@@ -144,13 +163,65 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
       bestEl,
       best === null
         ? null
-        : { shown: `Best ${best} / ${total}`, spoken: `Your best with these settings: ${best} out of ${total}` },
+        : {
+            shown: `Best ${best.score} / ${total}${best.seconds === undefined ? '' : ` in ${formatClock(best.seconds)}`}`,
+            spoken: `Your best with these settings: ${best.score} out of ${total}${best.seconds === undefined ? '' : ` in ${formatClock(best.seconds)}`}`,
+          },
     );
   }
+
+  // Timer. The clock pauses while an answer's feedback shows and while the page is hidden, so neither
+  // costs the player time.
+  const clock = new GameClock(tick);
+
+  function tick(elapsedMs: number): void {
+    const limit = countdownSeconds(settings.timer);
+    const elapsed = elapsedMs / 1000;
+    if (limit === null) {
+      clockEl.textContent = formatClock(elapsed);
+      return;
+    }
+    const left = Math.max(0, limit - elapsed);
+    const whole = Math.ceil(left);
+    clockEl.textContent = formatClock(whole);
+    clockBar.style.width = `${(left / limit) * 100}%`;
+    clockBar.classList.toggle('bg-pink', whole <= 10);
+    clockBar.classList.toggle('bg-teal', whole > 10);
+    for (const mark of [60, 10]) {
+      if (whole <= mark && limit > mark && !announced.has(mark)) {
+        announced.add(mark);
+        clockAnnounce.textContent = mark === 60 ? '1 minute left' : '10 seconds left';
+      }
+    }
+    if (left <= 0) {
+      timedOut = true;
+      clockAnnounce.textContent = "Time's up";
+      finish();
+    }
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && clock.running) {
+      clock.pause();
+      pausedWhileHidden = true;
+    } else if (!document.hidden && pausedWhileHidden) {
+      pausedWhileHidden = false;
+      if (!screens.play.hidden) clock.resume();
+    }
+  });
 
   // Game
   function start(): void {
     window.clearTimeout(advanceTimer);
+    timedOut = false;
+    pausedWhileHidden = false;
+    announced = new Set();
+    const timed = settings.timer !== 'off';
+    clockWrap.hidden = !timed;
+    clockTrack.hidden = countdownSeconds(settings.timer) === null;
+    clockAnnounce.textContent = '';
+    if (timed) clock.start();
+    else clock.stop();
     round = shuffle(poolFor(settings, base)).slice(0, totalFor(settings, base));
     solved = new Set();
     answered = new Set();
@@ -163,6 +234,7 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
 
   function showQuestion(index: number): void {
     window.clearTimeout(advanceTimer);
+    if (settings.timer !== 'off' && !document.hidden) clock.resume();
     current = index;
     const country = round[index];
     roundEl.textContent = String(index + 1);
@@ -206,6 +278,7 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
     solved.add(current);
     scoreEl.textContent = String(solved.size);
     setFeedback(`✓ Correct! It's ${quiz.answer(round[current])}.`, 'right');
+    clock.pause();
     advanceTimer = window.setTimeout(advance, ADVANCE_DELAY);
   }
 
@@ -288,7 +361,8 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
 
     if (option === answer) return markRight();
 
-    // A wrong tap waits for the player, so there's time to take in the right answer.
+    // A wrong tap waits for the player, so there's time to take in the right answer. The clock waits too.
+    clock.pause();
     picks.set(current, option);
     setFeedback(`✗ Not quite. It's ${answer}.`, 'wrong');
     continueBtn.textContent = current + 1 < round.length ? 'Next question' : 'See results';
@@ -299,19 +373,36 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
   // Giving up and results
   function finish(): void {
     window.clearTimeout(advanceTimer);
+    clock.stop();
+    pausedWhileHidden = false;
     const total = round.length;
     const score = solved.size;
+    // Rounded down, like the clock shown during play, so the two always agree.
+    const seconds = Math.floor(clock.elapsedMs() / 1000);
+    const limit = countdownSeconds(settings.timer);
+    const result = settings.timer === 'stopwatch' ? { score, seconds } : { score };
     const previous = readBest(quiz.id, settings, base);
-    const isBest = score > 0 && (previous === null || score > previous);
-    if (isBest) saveBest(quiz.id, settings, score, base);
+    const isBest = beats(result, previous);
+    if (isBest) saveBest(quiz.id, settings, result, base);
 
-    resultTitle.textContent = score === total ? `You got all ${total}!` : `You got ${score} out of ${total}`;
+    const scored = score === total ? `You got all ${total}` : `You got ${score} out of ${total}`;
+    resultTitle.textContent = timedOut
+      ? `Time's up! ${scored}`
+      : settings.timer === 'stopwatch'
+        ? `${scored} in ${formatClock(seconds)}`
+        : limit !== null && score === total
+          ? `${scored} with ${formatClock(Math.max(0, limit - seconds))} to spare`
+          : `${scored}${score === total ? '!' : ''}`;
+    const previousTime = previous?.seconds === undefined ? '' : ` in ${formatClock(previous.seconds)}`;
     renderBest(
       resultBest,
       isBest
         ? { shown: 'New best!', spoken: 'New best score!' }
         : previous
-          ? { shown: `Best ${previous} / ${total}`, spoken: `Your best: ${previous} out of ${total}` }
+          ? {
+              shown: `Best ${previous.score} / ${total}${previousTime}`,
+              spoken: `Your best: ${previous.score} out of ${total}${previousTime}`,
+            }
           : null,
     );
 
