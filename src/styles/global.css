@@ -52,6 +52,7 @@
   --text-label-md: 1.3125rem; /* status badge, list heading */
   --text-label-lg: 1.375rem; /* nav buttons, window titles */
   --text-label-xl: 1.5rem; /* eyebrows */
+  --text-caption: 0.8125rem; /* small print, e.g. data sources */
   --text-body-sm: 0.9375rem; /* compact buttons */
   --text-body: 1rem;
   --text-body-lg: 1.125rem; /* page intros */

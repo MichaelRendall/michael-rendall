@@ -15,7 +15,8 @@ const label = 'font-terminal text-label tracking-label';
 const summary = `${CATEGORIES[DEFAULT_SETTINGS.category].label} · all continents`;
 const retrieved = new Date(RETRIEVED).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 // One string, so line wrapping in the markup can't swallow the space before the date.
-const credit = `Figures: World Bank (population 2025, GDP mostly 2025, area 2024) and Wikidata (highest points), retrieved ${retrieved}.`;
+// Kept short and small. Which source covers what is noted in src/data/country-stats.ts.
+const credit = `Data: World Bank, IMF and Wikidata, ${retrieved}.`;
 const sides = ['left', 'right'] as const;
 ---
 
@@ -41,8 +42,7 @@ const sides = ['left', 'right'] as const;
 
       <section data-screen="start" class="flex flex-col items-start gap-3">
         <p class="text-body leading-[1.6] text-ink-soft">
-          You see one country's figure. Is the next country's higher or lower? Get it right and the next country takes
-          its place. How long can you keep the streak going? Choose population, GDP, area or highest point in Settings.
+          Guess whether the next country's figure is higher or lower. How long can you keep the streak going?
         </p>
         <p data-summary class={label}>
           {summary}
@@ -56,7 +56,7 @@ const sides = ['left', 'right'] as const;
             Settings
           </Button>
         </div>
-        <p class="text-body-sm text-ink-soft">{credit}</p>
+        <p class="text-caption text-ink-soft">{credit}</p>
         <noscript>
           <p class="text-body">The game needs JavaScript to run.</p>
         </noscript>
@@ -88,7 +88,10 @@ const sides = ['left', 'right'] as const;
                 class="aspect-4/3 w-full max-w-40 border-2 border-ink object-cover"
               />
               <p data-card-name class="font-semibold" />
-              <p data-card-value class="font-pixel text-label-xl font-bold" />
+              <p
+                data-card-value
+                class="text-[clamp(1.125rem,0.95rem+0.75vw,1.5rem)] leading-tight font-bold tabular-nums"
+              />
               <p data-card-detail class="min-h-[1.25em] text-body-sm text-ink-soft" />
             </div>
           ))}
