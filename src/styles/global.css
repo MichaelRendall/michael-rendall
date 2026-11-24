@@ -90,6 +90,20 @@
   body {
     background-color: var(--color-page);
   }
+
+  /*
+   * While a pop-up (a modal <dialog>) is open, the page behind it can't scroll. The scrollbar's space stays
+   * reserved, so the page doesn't shift sideways as it disappears.
+   */
+  html:has(dialog[open]) {
+    overflow: hidden;
+    scrollbar-gutter: stable;
+  }
+
+  /* A pop-up that scrolls on a small screen doesn't hand the scroll on to the page when it reaches the end. */
+  dialog {
+    overscroll-behavior: contain;
+  }
 }
 
 /*
