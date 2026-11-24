@@ -1,5 +1,7 @@
 ---
-// The year is rendered at build time and kept current by src/scripts/main.ts.
+// The year is rendered at build time and kept current by src/scripts/main.ts, which also runs the
+// install hint (src/scripts/install-hint.ts).
+import TextButton from './TextButton.astro';
 interface Props {
   /** Pushes the footer to the bottom of a flex column. */
   pinBottom?: boolean;
@@ -11,8 +13,19 @@ const { pinBottom = false } = Astro.props;
 const chip = 'bg-paper/75 px-3 py-1 font-terminal text-label tracking-label';
 ---
 
-<footer data-anim="intro" class:list={['flex justify-end', pinBottom && 'mt-auto']}>
-  <span class={chip}>
+<footer data-anim="intro" class:list={['flex flex-wrap items-center gap-3', pinBottom && 'mt-auto']}>
+  {/*
+    Install hint, hidden until the script knows the right instructions for this browser: Share then Add to
+    Home Screen on iPhone, or an Install button where the browser offers one. Never shown in the installed app.
+  */}
+  <p data-install-hint hidden class:list={[chip, '[@media(display-mode:standalone)]:hidden']}>
+    <TextButton data-install-button hidden size="md">
+      Install the app
+    </TextButton>
+    <span data-install-text></span>
+  </p>
+  {/* On the right from tablet width up, with or without the hint; on phones it sits on the left, below. */}
+  <span class:list={[chip, 'sm:ml-auto']}>
     © <span data-year>{new Date().getFullYear()}</span> Michael Rendall
   </span>
 </footer>
