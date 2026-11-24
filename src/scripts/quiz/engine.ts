@@ -89,7 +89,8 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
     if (country) new Image().src = images[country.code] ?? '';
   };
 
-  const listFormat = new Intl.ListFormat('en-GB', { type: 'conjunction' });
+  // US English formatting for its Oxford comma ("Europe, Asia, and Africa"); the en-GB format leaves it out.
+  const listFormat = new Intl.ListFormat('en-US', { type: 'conjunction' });
 
   // Settings form <-> settings object
   function applySettings(): void {

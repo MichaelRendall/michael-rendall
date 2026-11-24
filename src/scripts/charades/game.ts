@@ -363,7 +363,7 @@ export function initCharades(root: HTMLElement): void {
         ? `${winners[0]} wins!`
         : winners.length === scores.length
           ? "It's a draw!"
-          : `${winners.join(' and ')} tie!`;
+          : `${new Intl.ListFormat('en-US', { type: 'conjunction' }).format(winners)} tie!`;
     renderScoreboards();
     show('final', finalTitle);
   }
