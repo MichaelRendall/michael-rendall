@@ -20,7 +20,7 @@ import {
   totalFor,
   type Settings,
 } from './settings';
-import { checkedValues, setChecked, wireSettingsDialog } from '../settings-dialog';
+import { checkedValues, renderBest, renderSummary, setChecked, wireSettingsDialog } from '../settings-dialog';
 
 /** How long a right answer stays on screen before the next question, in ms. */
 const ADVANCE_DELAY = 1200;
@@ -116,32 +116,32 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
     introEl.textContent = quiz.intro[mode] ?? '';
   }
 
-  /**
-   * "10 flags from all continents", "All 14 flags from Oceania", "20 flags from Europe and Asia (95 countries)".
-   * Quizzes with more than one mode add it: "10 flags from all continents · Multiple choice".
-   */
-  function describe(): string {
+  /** The summary tags: ["10 flags", "All continents"], ["All 46 flags", "Europe", "Typing"]. */
+  function describe(): string[] {
     const total = totalFor(settings);
-    const available = poolFor(settings).length;
     const everywhere = settings.continents.length === continents.length;
-    const where = everywhere ? 'all continents' : listFormat.format(settings.continents);
-    const mode = quiz.modes.length > 1 ? ` · ${MODE_LABELS[settings.mode]}` : '';
-    if (total === available) return `All ${total} ${quiz.unit} from ${where}${mode}`;
-    return everywhere
-      ? `${total} ${quiz.unit} from ${where}${mode}`
-      : `${total} ${quiz.unit} from ${where} (${available} countries)${mode}`;
+    return [
+      total === poolFor(settings).length ? `All ${total} ${quiz.unit}` : `${total} ${quiz.unit}`,
+      everywhere ? 'All continents' : listFormat.format(settings.continents),
+      ...(quiz.modes.length > 1 ? [MODE_LABELS[settings.mode]] : []),
+    ];
   }
 
   function updateSummary(): void {
     const none = settings.continents.length === 0;
-    summaryEls.forEach((el) => (el.textContent = none ? 'Pick at least one continent.' : describe()));
+    summaryEls.forEach((el) => renderSummary(el, none ? 'Pick at least one continent.' : describe()));
     if (none) {
-      bestEl.hidden = true;
+      renderBest(bestEl, null);
       return;
     }
     const best = readBest(quiz.id, settings);
-    bestEl.hidden = best === null;
-    bestEl.textContent = best === null ? '' : `Your best with these settings: ${best} out of ${totalFor(settings)}`;
+    const total = totalFor(settings);
+    renderBest(
+      bestEl,
+      best === null
+        ? null
+        : { shown: `Best ${best} / ${total}`, spoken: `Your best with these settings: ${best} out of ${total}` },
+    );
   }
 
   // Game
@@ -302,7 +302,14 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
     if (isBest) saveBest(quiz.id, settings, score);
 
     resultTitle.textContent = score === total ? `You got all ${total}!` : `You got ${score} out of ${total}`;
-    resultBest.textContent = isBest ? '✦ New best score! ✦' : previous ? `Your best: ${previous} out of ${total}` : '';
+    renderBest(
+      resultBest,
+      isBest
+        ? { shown: 'New best!', spoken: 'New best score!' }
+        : previous
+          ? { shown: `Best ${previous} / ${total}`, spoken: `Your best: ${previous} out of ${total}` }
+          : null,
+    );
 
     const missed = round.map((country, index) => ({ country, index })).filter(({ index }) => !solved.has(index));
     missedWrap.hidden = missed.length === 0;

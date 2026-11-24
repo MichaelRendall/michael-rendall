@@ -12,8 +12,8 @@ interface Props {
   unit: string;
   /** The quiz's modes. With more than one, the player picks how to answer. */
   modes: readonly Mode[];
-  /** The summary line for the default settings. */
-  summary: string;
+  /** The summary tags for the default settings. */
+  summary: string[];
 }
 
 const { unit, modes, summary } = Astro.props;

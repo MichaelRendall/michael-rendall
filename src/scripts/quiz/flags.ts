@@ -20,12 +20,8 @@ export const flagsQuiz: QuizDefinition = {
   progressLabel: 'Flag',
   modes: ['type', 'choice'],
   intro: {
-    type:
-      "Name the country for each flag. Type the right name and it's accepted straight away. Stuck? Move on with " +
-      "Next and come back later. The quiz ends when you've named them all, or when you give up.",
-    choice:
-      'Pick the country for each flag from four countries on the same continent. You get one pick per flag, so ' +
-      'choose carefully. Use the number keys 1 to 4 if you prefer the keyboard.',
+    type: 'Name the country for each flag. Stuck? Skip ahead with Next and come back later.',
+    choice: 'Pick the country for each flag. You get one pick each.',
   },
   missedHeading: "Flags you didn't get",
   question: () => 'Which country is this?',

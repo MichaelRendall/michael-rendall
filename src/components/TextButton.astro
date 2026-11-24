@@ -3,17 +3,21 @@ import type { HTMLAttributes } from 'astro/types';
 
 // A quiet, underlined button for secondary actions (Select all, Give up). For main actions use Button.
 // min-h-6 keeps the tap target at least 24px tall (WCAG 2.2 target size).
-type Props = Omit<HTMLAttributes<'button'>, 'class'>;
+interface Props extends Omit<HTMLAttributes<'button'>, 'class'> {
+  /** sm: the default, for links under a group. md: matches text-label, for sitting in a line of label text. */
+  size?: 'sm' | 'md';
+}
 
-const { type = 'button', ...attrs } = Astro.props;
+const { type = 'button', size = 'sm', ...attrs } = Astro.props;
 ---
 
 <button
   type={type}
   class:list={[
-    'inline-flex min-h-6 shrink-0 cursor-pointer items-center font-terminal whitespace-nowrap text-label-sm tracking-label underline underline-offset-4 hover:text-accent',
+    'inline-flex min-h-6 shrink-0 cursor-pointer items-center font-terminal whitespace-nowrap tracking-label underline underline-offset-4 hover:text-accent',
     'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-violet',
     'disabled:cursor-default disabled:no-underline disabled:opacity-50',
+    size === 'md' ? 'text-label' : 'text-label-sm',
   ]}
   {...attrs}
 >

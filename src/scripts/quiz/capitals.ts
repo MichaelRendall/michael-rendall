@@ -36,9 +36,7 @@ export const capitalsQuiz: QuizDefinition = {
   progressLabel: 'Question',
   modes: ['choice'],
   intro: {
-    choice:
-      'Pick the capital of each country from four cities in that country. You get one pick per question, so ' +
-      'choose carefully. Use the number keys 1 to 4 if you prefer the keyboard.',
+    choice: 'Pick the capital from four cities in the same country. You get one pick each.',
   },
   missedHeading: 'Capitals you missed',
   question: (country) => `What's the capital of ${nameInSentence(country)}?`,
