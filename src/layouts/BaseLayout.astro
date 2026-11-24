@@ -37,15 +37,18 @@ const screen = page === 'home';
     >
       Skip to content
     </a>
-    <div class:list={['relative w-full font-sans text-ink', screen ? 'overflow-x-clip bg-page' : 'min-h-screen']}>
+    {/*
+      Heights use svh, the visible height on phones with the browser bars showing. 100vh (min-h-screen) is the
+      height with the bars hidden, which pushed the footer just off screen on short pages.
+    */}
+    <div class:list={['relative w-full font-sans text-ink', screen ? 'overflow-x-clip bg-page' : 'min-h-svh']}>
       <Backdrop fixed={!screen} />
       <div
         class:list={[
           'relative z-2 flex flex-col px-[clamp(1.25rem,5vw,4.5rem)] py-[clamp(1.25rem,4vw,3rem)]',
           // Content stops spreading at 1440px (padding included) and centres; the scene still fills the screen.
           'mx-auto w-full max-w-360',
-          // svh: the visible screen height on phones, excluding the browser toolbar.
-          screen ? 'min-h-svh justify-between gap-6 short:py-8' : 'min-h-screen gap-12',
+          screen ? 'min-h-svh justify-between gap-6 short:py-8' : 'min-h-svh gap-12',
         ]}
       >
         <SiteHeader current={page} />

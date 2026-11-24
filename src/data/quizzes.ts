@@ -26,7 +26,7 @@ export const quizzes: HubCard[] = [
     summary: 'Name the country from its outline. Type it or pick from four.',
     icon: 'shape',
     previewColours: ['#ffe0ef', '#c9f5f1'],
-    shadow: 'mint',
+    shadow: 'teal',
     href: '/quizzes/shapes',
   },
 ];

@@ -1,5 +1,5 @@
 ---
-import type { HubCard } from '../data/cards';
+import { SHADOW_CLASS, type HubCard } from '../data/cards';
 import Button from './Button.astro';
 import Icon from './Icon.astro';
 import TitleBar from './TitleBar.astro';
@@ -10,13 +10,12 @@ interface Props {
 }
 
 const { card } = Astro.props;
-const shadows = { mint: '', pink: 'shadow-pink', lilac: 'shadow-lilac' };
 const [from, to] = card.previewColours;
 ---
 
 <article
   data-anim="intro"
-  class:list={['flex flex-col border-2 border-ink bg-paper shadow-hard-8', shadows[card.shadow]]}
+  class:list={['flex flex-col border-2 border-ink bg-paper shadow-hard-8', SHADOW_CLASS[card.shadow]]}
 >
   <TitleBar size="sm" controls={2}>
     <span class="font-terminal text-label">{card.file}</span>
