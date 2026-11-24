@@ -99,6 +99,21 @@ const label = 'font-terminal text-label tracking-label';
           Give up
         </TextButton>
       </div>
+      {/*
+        The clock, laid out like Charades': a countdown bar filling the width with the time on the right.
+        Stopwatch mode shows just the time, in the same place. Hidden from screen readers, which hear the
+        time at milestones instead (below).
+      */}
+      <div data-clock-wrap hidden aria-hidden="true" class="flex items-center justify-end gap-3">
+        <div data-clock-track hidden class="h-3 grow border-2 border-ink bg-paper">
+          <div data-clock-bar class="h-full w-full bg-teal"></div>
+        </div>
+        <p data-clock class="font-terminal text-label-xl tabular-nums">
+          0:00
+        </p>
+      </div>
+      {/* Screen readers only: "1 minute left", "10 seconds left", "Time's up". */}
+      <p data-clock-announce aria-live="assertive" class="sr-only"></p>
       {/* Smaller on phones so the answers fit below it. A fixed size, not one tied to screen height, so it
         doesn't change when the on-screen keyboard opens. */}
       <img

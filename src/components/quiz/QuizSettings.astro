@@ -6,7 +6,7 @@ import ContinentsField from '../settings/ContinentsField.astro';
 import SettingsDialog from '../settings/SettingsDialog.astro';
 import type { Country } from '../../data/countries';
 import { MODE_LABELS, type Mode } from '../../scripts/quiz/definition';
-import { LENGTHS, defaultSettings } from '../../scripts/quiz/settings';
+import { LENGTHS, TIMERS, TIMER_LABELS, defaultSettings } from '../../scripts/quiz/settings';
 
 interface Props {
   /** Plural noun, e.g. "flags" for "Flags per game". */
@@ -42,4 +42,11 @@ const unitTitle = unit.charAt(0).toUpperCase() + unit.slice(1);
     checked={[String(defaults.length)]}
   />
   <ContinentsField countries={countries} />
+  <ChipGroup
+    legend="Timer"
+    name="timer"
+    type="radio"
+    options={TIMERS.map((timer) => ({ value: timer, label: TIMER_LABELS[timer] }))}
+    checked={[defaults.timer]}
+  />
 </SettingsDialog>
