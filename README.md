@@ -61,6 +61,14 @@ Open the folder in VS Code and install the recommended extensions when prompted 
 
 Vercel builds the site on every push to the connected Git repository. Production deploys come from the default branch, and every other branch gets a preview URL. To deploy without Git, run `npx vercel` (preview) or `npx vercel --prod`.
 
+## Installable app and offline play
+
+The site is a PWA (installable web app), named Mike's Quizzes, shown as Quizzes under its icon. `@vite-pwa/astro` in `astro.config.ts` writes the manifest and a service worker that saves every page, script, font, flag and outline on the first visit (about 0.85 MB to download), so every game works offline. New deploys download in the background and take over on the next visit.
+
+- The service worker only runs in a production build: test offline with `npm run build` then `npm run preview`, and check Chrome DevTools > Application.
+- App icons live in `public/icons/`. To remake them after changing `public/favicon.svg`, run `npx pwa-assets-generator --config tools/pwa-assets.config.mjs` and copy the three files it lists into `public/icons/`.
+- The home page's install hint (`src/scripts/install-hint.ts`) only shows where its instructions are right: Share, then Add to Home Screen on iPhone, or an Install button where the browser offers one.
+
 ## Common changes
 
 - **Add a quiz:** write a definition in `src/scripts/quiz/<name>.ts` (see `definition.ts` and the two existing quizzes), create `src/pages/quizzes/<name>.astro` using the `Quiz` component (copy `flags.astro`), then add a card in `src/data/quizzes.ts` with `href: '/quizzes/<name>'`. A card without an `href` shows as "Coming soon".

@@ -28,6 +28,10 @@ const screen = page === 'home';
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    {/* The app's name under its home screen icon on iPhone, which otherwise uses the page title. */}
+    <meta name="apple-mobile-web-app-title" content="Quizzes" />
+    <meta name="theme-color" content="#f6b8d8" />
   </head>
   <body>
     {/* Hidden until focused: lets keyboard users jump past the header. Every page's <main> has id="main". */}
