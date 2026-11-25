@@ -20,15 +20,19 @@ src/
                   quizzes.ts, games.ts: the cards on the two hub pages
                   charades-prompts.ts: the charades prompts, by category and difficulty
                   blend-in-words.ts: Blend In's secret words, as [word, close cousin] pairs
+                  guess-the-year.ts: Guess the Year's prompts, each with its year and Wikidata search term
   scripts/        main.ts: keeps the footer's copyright year current
                   quiz/: the shared quiz engine, settings and answer matching, plus one
                   definition per quiz (flags.ts, capitals.ts, shapes.ts)
                   higher-lower/: the higher-or-lower game and its categories
                   charades/, blend-in/: the party games and their settings
+                  guess-the-year/: the Guess the Year quiz, solo and party
+                  player-list.ts: the shared list of named players (Blend In, Guess the Year)
                   settings-dialog.ts: client side of the shared settings pop-up
   styles/         global.css: Tailwind, fonts, colour and shadow tokens
 public/           Files copied to the site root unchanged (favicons, robots.txt, images)
-tools/            fetch-country-stats.mjs (higher-or-lower figures), make-shapes.mjs (country outlines
+tools/            fetch-country-stats.mjs (higher-or-lower figures), check-years.mjs (checks Guess the Year against Wikidata),
+                  make-shapes.mjs (country outlines
                   into src/assets/shapes/), make-grain.py
 ```
 
@@ -76,6 +80,7 @@ The site is a PWA (installable web app), named Mike's Quizzes, shown as Quizzes 
 - **Update the higher-or-lower figures:** run `node tools/fetch-country-stats.mjs`. It downloads the latest World Bank and Wikidata figures and rewrites `src/data/country-stats.ts`, then lists any gaps. Review the diff before committing.
 - **Redraw the country outlines:** run `node tools/make-shapes.mjs`. It downloads Natural Earth's country boundaries once (cached in `tools/.cache/`), redraws `src/assets/shapes/` and reports what it left out. To leave a country out of the shapes quiz, add it to `src/data/shapes.ts` and rerun.
 - **Add a higher-or-lower category:** add a field to the script, rerun it, and add an entry in `src/scripts/higher-lower/categories.ts`.
+- **Add or change Guess the Year prompts:** edit `src/data/guess-the-year.ts`, giving each its English Wikipedia article title, then run `node tools/check-years.mjs`. It reports any year that doesn't match Wikidata. Where both are right but date different moments (invented vs on sale), record it in `CHECKED_DIFFERENCES`.
 - **Edit Blend In's words:** edit `src/data/blend-in-words.ts`. Each entry is a word and a close cousin; Undercover mode gives the outsider the cousin.
 - **Edit the charades prompts:** edit `src/data/charades-prompts.ts`. Categories and difficulty levels are lists there; the game picks up any changes.
 - **Add a game:** create `src/pages/games/<name>.astro` wrapped in `<BaseLayout page="games">`, then add a card in `src/data/games.ts` with `href: '/games/<name>'`.

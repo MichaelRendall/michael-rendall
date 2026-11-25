@@ -4,6 +4,7 @@
 // Screens: start → turn (pass to the actor) → act (prompt and timer) → buzzer (did they get the last one?)
 // → summary (this round's prompts) → the next team's turn, until every team has had its rounds → final.
 import { CATEGORIES, CATEGORY_LABELS, prompts, type Category } from '../../data/charades-prompts';
+import { withMark, type MarkKind } from '../marks';
 import { checkedValues, renderSummary, setChecked, wireSettingsDialog } from '../settings-dialog';
 import {
   DEFAULT_SETTINGS,
@@ -161,9 +162,11 @@ export function initCharades(root: HTMLElement): void {
   // Scores
   function renderScoreboards(): void {
     const best = Math.max(...scores);
+    // Highest first. Teams on the same score keep their order from Settings.
+    const ranked = scores.map((score, team) => ({ score, team })).sort((a, b) => b.score - a.score || a.team - b.team);
     scoreboards.forEach((list) =>
       list.replaceChildren(
-        ...scores.map((score, team) => {
+        ...ranked.map(({ score, team }) => {
           const li = document.createElement('li');
           li.className = 'flex justify-between gap-6 bg-blush px-3 py-1';
           const name = document.createElement('span');
@@ -328,20 +331,17 @@ export function initCharades(root: HTMLElement): void {
     const team = teamName(settings, teamOf(turn));
     const points = log.got.length;
     summaryTitle.textContent = `${team} got ${points} ${points === 1 ? 'point' : 'points'}`;
-    const fill = (list: HTMLUListElement, items: string[], mark: string): void =>
+    const fill = (list: HTMLUListElement, items: string[], mark: MarkKind): void =>
       list.replaceChildren(
         ...items.map((text) => {
           const li = document.createElement('li');
-          const markEl = document.createElement('span');
-          markEl.setAttribute('aria-hidden', 'true');
-          markEl.textContent = `${mark} `;
-          li.append(markEl, text);
+          li.append(withMark(mark, text));
           return li;
         }),
       );
-    fill(gotList, log.got, '✓');
+    fill(gotList, log.got, 'tick');
     gotList.hidden = !log.got.length;
-    fill(skippedList, log.skipped, '✗');
+    fill(skippedList, log.skipped, 'cross');
     skippedWrap.hidden = !log.skipped.length;
     renderScoreboards();
     const last = turn + 1 >= totalTurns();

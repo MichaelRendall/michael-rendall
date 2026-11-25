@@ -1,0 +1,25 @@
+---
+// The tick or cross (src/scripts/marks.ts), drawn at build time. Decorative: the text around it says right
+// or wrong. Place it in a flex row with items-center (buttons and chips already are) so it lines up.
+import { MARKS, MARK_CLASS, MARK_SHADOW_OFFSET, MARK_STROKE, type MarkKind } from '../scripts/marks';
+
+interface Props {
+  kind: MarkKind;
+  /** Display classes in place of the default inline-block, e.g. to show the mark only when a chip is selected. */
+  class?: string;
+}
+
+const { kind, class: className } = Astro.props;
+const { d, fill, shadow } = MARKS[kind];
+const stroke = {
+  'stroke-width': MARK_STROKE,
+  'stroke-linecap': 'round',
+  'stroke-linejoin': 'round',
+  fill: 'none',
+} as const;
+---
+
+<svg viewBox="0 0 24 24" aria-hidden="true" class:list={[MARK_CLASS, className ?? 'inline-block']}>
+  <path d={d} stroke={shadow} transform={`translate(${MARK_SHADOW_OFFSET} ${MARK_SHADOW_OFFSET})`} {...stroke}></path>
+  <path d={d} stroke={fill} {...stroke}></path>
+</svg>

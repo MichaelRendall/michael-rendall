@@ -5,6 +5,7 @@ import TextButton from '../../components/TextButton.astro';
 import Window from '../../components/Window.astro';
 import ChipGroup from '../../components/settings/ChipGroup.astro';
 import PickSeveralField from '../../components/settings/PickSeveralField.astro';
+import PlayerNamesField from '../../components/settings/PlayerNamesField.astro';
 import SettingsDialog from '../../components/settings/SettingsDialog.astro';
 import SummaryTags from '../../components/settings/SummaryTags.astro';
 import { SUMMARY_TAG_CLASS } from '../../scripts/settings-dialog';
@@ -25,8 +26,6 @@ const label = 'font-terminal text-label tracking-label';
 const heading = 'font-pixel text-label-xl font-bold focus:outline-none';
 const summary = describe(DEFAULT_SETTINGS);
 const scoreboard = 'flex w-full max-w-80 flex-col gap-1 text-body';
-const textInput =
-  'min-h-10 w-full border-2 border-ink bg-white px-2 font-sans text-body tracking-normal text-ink placeholder:text-ink-soft focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-violet';
 ---
 
 <BaseLayout
@@ -190,35 +189,12 @@ const textInput =
       </section>
 
       <SettingsDialog summary={summary}>
-        <fieldset class="flex w-full flex-col gap-1.5">
-          <legend class="mb-1.5 font-terminal text-label tracking-label">Players, in order round the circle</legend>
-          <div class="flex w-full flex-col gap-2">
-            {Array.from({ length: MAX_PLAYERS }, (_, i) => (
-              <div data-player-row hidden={i >= DEFAULT_SETTINGS.players.length} class="flex items-center gap-2">
-                <input
-                  name="player"
-                  type="text"
-                  maxlength={PLAYER_NAME_MAX}
-                  placeholder={`Player ${i + 1}`}
-                  aria-label={`Player ${i + 1}`}
-                  autocomplete="off"
-                  spellcheck="false"
-                  data-1p-ignore
-                  data-lpignore="true"
-                  data-bwignore
-                  data-form-type="other"
-                  class={textInput}
-                />
-                <TextButton data-remove-player aria-label={`Remove player ${i + 1}`}>
-                  Remove
-                </TextButton>
-              </div>
-            ))}
-          </div>
-          <div class="mt-1">
-            <TextButton data-add-player>Add player</TextButton>
-          </div>
-        </fieldset>
+        <PlayerNamesField
+          legend="Players, in order round the circle"
+          max={MAX_PLAYERS}
+          initial={DEFAULT_SETTINGS.players.length}
+          maxLength={PLAYER_NAME_MAX}
+        />
         <PickSeveralField
           legend="Categories"
           name="category"

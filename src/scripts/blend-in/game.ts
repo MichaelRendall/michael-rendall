@@ -11,6 +11,7 @@
 // - The outsider is caught and doesn't: everyone else scores 1.
 import { CATEGORIES, CATEGORY_LABELS, words, type Category } from '../../data/blend-in-words';
 import { GameClock, formatClock } from '../quiz/clock';
+import { wirePlayerList } from '../player-list';
 import { checkedValues, renderSummary, setChecked, wireSettingsDialog } from '../settings-dialog';
 import {
   CLUE_ROUND_OPTIONS,
@@ -55,9 +56,7 @@ export function initBlendIn(root: HTMLElement): void {
   };
   const settingsForm = $<HTMLFormElement>('[data-settings]');
   const summaryEls = root.querySelectorAll<HTMLElement>('[data-summary]');
-  const playerRows = Array.from(settingsForm.querySelectorAll<HTMLElement>('[data-player-row]'));
-  const playerInputs = playerRows.map((row) => row.querySelector('input') as HTMLInputElement);
-  const addPlayerBtn = $<HTMLButtonElement>('[data-add-player]');
+  const playerList = wirePlayerList(settingsForm, { min: MIN_PLAYERS, max: MAX_PLAYERS }, settingsChanged);
   const passTitle = $('[data-pass-title]');
   const showCardBtn = $<HTMLButtonElement>('[data-show-card]');
   const card = $('[data-card]');
@@ -97,30 +96,19 @@ export function initBlendIn(root: HTMLElement): void {
     focus?.focus();
   }
 
-  // Settings: player list
-  function applyPlayers(): void {
-    playerRows.forEach((row, i) => {
-      row.hidden = i >= count();
-      playerInputs[i].value = settings.players[i] ?? '';
-      const remove = row.querySelector<HTMLButtonElement>('[data-remove-player]');
-      if (remove) remove.disabled = count() <= MIN_PLAYERS;
-    });
-    addPlayerBtn.disabled = count() >= MAX_PLAYERS;
-  }
-
   function applySettings(): void {
     setChecked(settingsForm, 'category', settings.categories);
     setChecked(settingsForm, 'mode', [settings.mode]);
     setChecked(settingsForm, 'clue-rounds', [String(settings.clueRounds)]);
     setChecked(settingsForm, 'discuss', [String(settings.discussSeconds)]);
-    applyPlayers();
+    playerList.set(settings.players);
   }
 
   function readSettingsForm(): Settings {
     const one = (field: string): string | undefined => checkedValues(settingsForm, field)[0];
     const picked = checkedValues(settingsForm, 'category');
     return {
-      players: playerInputs.slice(0, count()).map((input) => input.value.slice(0, PLAYER_NAME_MAX)),
+      players: playerList.names().map((player) => player.slice(0, PLAYER_NAME_MAX)),
       categories: CATEGORIES.filter((c) => picked.includes(c)),
       mode: MODES.find((m) => m === one('mode')) ?? DEFAULT_SETTINGS.mode,
       clueRounds: CLUE_ROUND_OPTIONS.find((o) => String(o) === one('clue-rounds')) ?? DEFAULT_SETTINGS.clueRounds,
@@ -142,9 +130,13 @@ export function initBlendIn(root: HTMLElement): void {
   // Scores
   function renderScoreboards(): void {
     const best = Math.max(...scores);
+    // Highest first. Players on the same score keep their order from Settings.
+    const ranked = scores
+      .map((score, player) => ({ score, player }))
+      .sort((a, b) => b.score - a.score || a.player - b.player);
     scoreboards.forEach((list) =>
       list.replaceChildren(
-        ...scores.map((score, player) => {
+        ...ranked.map(({ score, player }) => {
           const li = document.createElement('li');
           li.className = 'flex justify-between gap-6 bg-blush px-3 py-1';
           if (score === best && best > 0) li.classList.add('font-semibold');
@@ -331,30 +323,6 @@ export function initBlendIn(root: HTMLElement): void {
     },
     'category',
   );
-  // Names save as they're typed, so pressing Enter or Done never loses the last one.
-  settingsForm.addEventListener('input', (event) => {
-    if ((event.target as HTMLElement).matches('input[name="player"]')) settingsChanged();
-  });
-  addPlayerBtn.addEventListener('click', () => {
-    if (count() >= MAX_PLAYERS) return;
-    settings = { ...settings, players: [...settings.players, ''] };
-    applyPlayers();
-    settingsChanged();
-    playerInputs[count() - 1]?.focus();
-  });
-  playerRows.forEach((row, i) =>
-    row.querySelector('[data-remove-player]')?.addEventListener('click', () => {
-      if (count() <= MIN_PLAYERS) return;
-      // Typed names move up a row, so removing Player 2 keeps everyone else's name.
-      const names = playerInputs.slice(0, count()).map((input) => input.value);
-      names.splice(i, 1);
-      settings = { ...settings, players: names };
-      applyPlayers();
-      settingsChanged();
-      (playerInputs[Math.min(i, count() - 1)] ?? addPlayerBtn).focus();
-    }),
-  );
-
   // Play
   $('[data-start]').addEventListener('click', startGame);
   showCardBtn.addEventListener('click', showCard);

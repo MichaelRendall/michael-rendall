@@ -1,4 +1,6 @@
 ---
+import Mark from '../Mark.astro';
+
 // A labelled group of settings chips: each is a visually hidden radio or checkbox inside a clickable
 // label. The tick marks selected chips without relying on colour alone. Extra controls go in the slot.
 interface Option {
@@ -33,9 +35,7 @@ const { legend, name, type, options, checked } = Astro.props;
         ]}
       >
         <input type={type} name={name} value={option.value} checked={checked.includes(option.value)} class="sr-only" />
-        <span aria-hidden="true" class="hidden group-has-checked:inline">
-          ✓
-        </span>
+        <Mark kind="tick" class="hidden group-has-checked:inline-block" />
         {option.label}
         {option.note && <span class="text-ink-soft">({option.note})</span>}
       </label>
