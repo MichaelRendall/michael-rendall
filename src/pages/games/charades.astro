@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Button from '../../components/Button.astro';
+import Mark from '../../components/Mark.astro';
 import TextButton from '../../components/TextButton.astro';
 import Window from '../../components/Window.astro';
 import ChipGroup from '../../components/settings/ChipGroup.astro';
@@ -118,7 +119,7 @@ const scoreboard = 'flex w-full max-w-80 flex-col gap-1 text-body';
         </div>
         <div class="grid grid-cols-2 gap-3">
           <Button data-got size="lg">
-            ✓ Got it
+            <Mark kind="tick" /> Got it
           </Button>
           <Button data-skip size="lg" variant="secondary">
             Skip

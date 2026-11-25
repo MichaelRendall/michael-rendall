@@ -152,3 +152,82 @@
     transparent 3px
   );
 }
+
+/* Number inputs without the browser's up and down arrows (the year box uses its own nudge buttons). */
+@utility no-spinner {
+  appearance: textfield;
+
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+}
+
+/*
+ * A retro slider: a chunky bordered track in the title-bar gradient, and a square handle with a hard
+ * offset shadow like the buttons. Each browser styles the track and handle through its own pseudo-elements.
+ */
+@utility range-retro {
+  appearance: none;
+  height: 2.25rem;
+  background: transparent;
+  cursor: pointer;
+
+  /* The track's height includes its border, which the handle's centring below relies on. */
+  &::-webkit-slider-runnable-track {
+    box-sizing: border-box;
+    height: 0.875rem;
+    border: 2px solid var(--color-ink);
+    background: linear-gradient(90deg, var(--color-pink), var(--color-lilac), var(--color-sky));
+  }
+
+  &::-moz-range-track {
+    box-sizing: border-box;
+    height: 0.875rem;
+    border: 2px solid var(--color-ink);
+    background: linear-gradient(90deg, var(--color-pink), var(--color-lilac), var(--color-sky));
+  }
+
+  &::-webkit-slider-thumb {
+    appearance: none;
+    width: 1.5rem;
+    height: 1.75rem;
+    /* Centres the handle on the track: half the difference in height, less the track's 2px top border. */
+    margin-top: calc((0.875rem - 1.75rem) / 2 - 2px);
+    border: 2px solid var(--color-ink);
+    background: var(--color-paper);
+    box-shadow: 3px 3px 0 var(--color-mint);
+  }
+
+  &::-moz-range-thumb {
+    width: 1.5rem;
+    height: 1.75rem;
+    border: 2px solid var(--color-ink);
+    border-radius: 0;
+    background: var(--color-paper);
+    box-shadow: 3px 3px 0 var(--color-mint);
+  }
+
+  &:hover::-webkit-slider-thumb {
+    background: var(--color-pink-light);
+  }
+
+  &:hover::-moz-range-thumb {
+    background: var(--color-pink-light);
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  &:focus-visible::-webkit-slider-thumb {
+    outline: 3px solid var(--color-violet);
+    outline-offset: 3px;
+  }
+
+  &:focus-visible::-moz-range-thumb {
+    outline: 3px solid var(--color-violet);
+    outline-offset: 3px;
+  }
+}

@@ -29,4 +29,13 @@ export const quizzes: HubCard[] = [
     shadow: 'teal',
     href: '/quizzes/shapes',
   },
+  {
+    file: 'guess_the_year.exe',
+    name: 'Guess the Year',
+    summary: 'When did it happen? Points for getting close. Play solo or pass the phone round your friends.',
+    icon: 'calendar',
+    previewColours: ['#e6dcff', '#ffe0ef'],
+    shadow: 'lilac',
+    href: '/quizzes/guess-the-year',
+  },
 ];

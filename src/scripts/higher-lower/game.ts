@@ -3,6 +3,7 @@
 import { continents, countries, nameInSentence, type Continent, type Country } from '../../data/countries';
 import { checkedValues, renderBest, renderSummary, setChecked, wireSettingsDialog } from '../settings-dialog';
 import { CATEGORIES, CATEGORY_IDS, type CategoryId } from './categories';
+import { withMark } from '../marks';
 
 /** How long a right answer's figure stays on screen before the next pair, in ms. */
 const ADVANCE_DELAY = 1400;
@@ -242,7 +243,8 @@ export function initHigherLower(root: HTMLElement): void {
   }
 
   function setFeedback(message: string, tone?: 'right' | 'wrong'): void {
-    feedback.textContent = message;
+    // Right and wrong get the pixel tick or cross before the message.
+    feedback.replaceChildren(tone ? withMark(tone === 'right' ? 'tick' : 'cross', message) : message);
     feedback.classList.toggle('text-accent', tone === 'right');
     feedback.classList.toggle('text-wrong', tone === 'wrong');
   }
@@ -262,7 +264,7 @@ export function initHigherLower(root: HTMLElement): void {
     if (correct) {
       streak++;
       streakEl.textContent = String(streak);
-      setFeedback(a === b ? `✓ A tie! ${figure}.` : `✓ Correct! ${figure}.`, 'right');
+      setFeedback(a === b ? `A tie! ${figure}.` : `Correct! ${figure}.`, 'right');
       const next = right;
       advanceTimer = window.setTimeout(() => {
         left = next;
@@ -274,7 +276,7 @@ export function initHigherLower(root: HTMLElement): void {
     }
 
     const actual = b > a ? category().higherLabel : category().lowerLabel;
-    setFeedback(`✗ ${figure}. That's ${actual.toLowerCase()} than ${nameInSentence(left)}.`, 'wrong');
+    setFeedback(`${figure}. That's ${actual.toLowerCase()} than ${nameInSentence(left)}.`, 'wrong');
     continueBtn.hidden = false;
     continueBtn.focus();
   }

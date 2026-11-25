@@ -10,6 +10,7 @@
 import { continents, countries, type Country } from '../../data/countries';
 import { MODE_LABELS, shuffle, type Mode, type QuizDefinition } from './definition';
 import { GameClock, formatClock } from './clock';
+import { createMark, withMark } from '../marks';
 import {
   defaultSettings,
   LENGTHS,
@@ -268,7 +269,8 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
   }
 
   function setFeedback(message: string, tone?: 'right' | 'wrong'): void {
-    feedback.textContent = message;
+    // Right and wrong get the pixel tick or cross before the message.
+    feedback.replaceChildren(tone ? withMark(tone === 'right' ? 'tick' : 'cross', message) : message);
     feedback.classList.toggle('text-accent', tone === 'right');
     feedback.classList.toggle('text-wrong', tone === 'wrong');
   }
@@ -277,7 +279,7 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
   function markRight(): void {
     solved.add(current);
     scoreEl.textContent = String(solved.size);
-    setFeedback(`✓ Correct! It's ${quiz.answer(round[current])}.`, 'right');
+    setFeedback(`Correct! It's ${quiz.answer(round[current])}.`, 'right');
     clock.pause();
     advanceTimer = window.setTimeout(advance, ADVANCE_DELAY);
   }
@@ -325,7 +327,7 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
         const text = document.createElement('span');
         text.className = 'grow';
         text.textContent = option;
-        // The visible ✓ or ✗, plus words for screen readers, filled in once the player has picked.
+        // The visible tick or cross, plus words for screen readers, filled in once the player has picked.
         const mark = document.createElement('span');
         mark.dataset.mark = '';
         mark.setAttribute('aria-hidden', 'true');
@@ -350,11 +352,11 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
       const state = button.querySelector<HTMLElement>('[data-state-text]');
       if (button.dataset.option === answer) {
         button.dataset.state = 'right';
-        if (mark) mark.textContent = '✓';
+        mark?.replaceChildren(createMark('tick'));
         if (state) state.textContent = option === answer ? ', your answer, correct' : ', correct answer';
       } else if (button.dataset.option === option) {
         button.dataset.state = 'wrong';
-        if (mark) mark.textContent = '✗';
+        mark?.replaceChildren(createMark('cross'));
         if (state) state.textContent = ', your answer, wrong';
       }
     }
@@ -364,7 +366,7 @@ export function initQuiz(root: HTMLElement, quiz: QuizDefinition): void {
     // A wrong tap waits for the player, so there's time to take in the right answer. The clock waits too.
     clock.pause();
     picks.set(current, option);
-    setFeedback(`✗ Not quite. It's ${answer}.`, 'wrong');
+    setFeedback(`Not quite. It's ${answer}.`, 'wrong');
     continueBtn.textContent = current + 1 < round.length ? 'Next question' : 'See results';
     continueBtn.hidden = false;
     continueBtn.focus();

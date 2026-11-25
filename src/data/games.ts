@@ -12,6 +12,15 @@ export const games: HubCard[] = [
     href: '/games/charades',
   },
   {
+    file: 'blend_in.exe',
+    name: 'Blend In',
+    summary: "One of you doesn't know the secret word. Give clues, spot the bluffer, and don't get caught.",
+    icon: 'eye',
+    previewColours: ['#c9f5f1', '#d9c8ff'],
+    shadow: 'teal',
+    href: '/games/blend-in',
+  },
+  {
     file: 'higher_lower.exe',
     name: 'Higher or lower',
     summary: 'Is the next country higher or lower? Population, GDP, area, or highest point. Keep the streak going.',

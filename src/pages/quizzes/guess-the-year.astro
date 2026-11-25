@@ -1,0 +1,268 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Button from '../../components/Button.astro';
+import TextButton from '../../components/TextButton.astro';
+import Window from '../../components/Window.astro';
+import ChipGroup from '../../components/settings/ChipGroup.astro';
+import PickSeveralField from '../../components/settings/PickSeveralField.astro';
+import PlayerNamesField from '../../components/settings/PlayerNamesField.astro';
+import SettingsDialog from '../../components/settings/SettingsDialog.astro';
+import SummaryTags from '../../components/settings/SummaryTags.astro';
+import { CATEGORIES, CATEGORY_LABELS, prompts } from '../../data/guess-the-year';
+import { BEST_TAG_CLASS, SUMMARY_TAG_CLASS } from '../../scripts/settings-dialog';
+import {
+  DEFAULT_SETTINGS,
+  ERAS,
+  ERA_LABELS,
+  LENGTHS,
+  MAX_PLAYERS,
+  MODES,
+  MODE_LABELS,
+  PLAYER_NAME_MAX,
+  TIMERS,
+  TIMER_LABELS,
+  describe,
+} from '../../scripts/guess-the-year/settings';
+
+const label = 'font-terminal text-label tracking-label';
+const heading = 'font-pixel text-label-xl font-bold focus:outline-none';
+const summary = describe(DEFAULT_SETTINGS);
+const scoreboard = 'flex w-full max-w-80 flex-col gap-1 text-body';
+const nudges = [-10, -1, 1, 10];
+---
+
+<BaseLayout
+  page="quizzes"
+  title="Guess the Year, Michael Rendall"
+  description="When did it happen? Guess the year of famous moments, alone or with friends."
+>
+  <Window
+    as="main"
+    id="main"
+    title="guess_the_year.exe"
+    aria-labelledby="game-title"
+    class="mx-auto w-full max-w-136 shadow-hard-8 shadow-lilac"
+  >
+    <div data-guess-the-year class="flex flex-col gap-4 p-[clamp(1.25rem,2.5vw,1.75rem)]">
+      <h1
+        id="game-title"
+        class="text-chrome font-pixel text-[clamp(1.75rem,1.25rem+1.5vw,2.5rem)] leading-[1.08] font-bold"
+      >
+        Guess the Year
+      </h1>
+
+      <section data-screen="start" class="flex flex-col items-start gap-3">
+        <p class="text-body leading-[1.6] text-ink-soft">
+          When did it happen? Spot on scores 5, within 2 years scores 3, and within 5 scores 1. Play solo, or as a party
+          passing the phone.
+        </p>
+        <SummaryTags parts={summary} />
+        <p data-best hidden class={BEST_TAG_CLASS}></p>
+        <div class="flex flex-wrap gap-2.5">
+          <Button data-start icon="play">
+            Start quiz
+          </Button>
+          <Button data-open-settings variant="secondary" icon="sliders">
+            Settings
+          </Button>
+        </div>
+        <noscript>
+          <p class="text-body">The quiz needs JavaScript to run.</p>
+        </noscript>
+      </section>
+
+      <section data-screen="pass" hidden class="flex flex-col items-start gap-3">
+        <h2 data-pass-title tabindex="-1" class={heading}>
+          Pass to Player 1
+        </h2>
+        <p class="text-body text-ink-soft">Lock in your guess in secret, then pass the phone on.</p>
+        <Button data-pass-ready size="lg" icon="play">
+          I'm ready
+        </Button>
+      </section>
+
+      <section data-screen="guess" hidden class="flex flex-col gap-4">
+        <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+          <p data-progress class:list={[label, 'whitespace-nowrap']}>
+            1 / 10
+          </p>
+          <TextButton data-end-game size="md">
+            End game
+          </TextButton>
+        </div>
+        {/* Solo timer, laid out like the other quizzes'. Screen readers hear milestones instead. */}
+        <div data-clock-wrap hidden aria-hidden="true" class="flex items-center justify-end gap-3">
+          <div data-clock-track hidden class="h-3 grow border-2 border-ink bg-paper">
+            <div data-clock-bar class="h-full w-full bg-teal"></div>
+          </div>
+          <p data-clock class="font-terminal text-label-xl tabular-nums">
+            0:00
+          </p>
+        </div>
+        <p data-clock-announce aria-live="assertive" class="sr-only"></p>
+
+        <div class="flex min-h-36 flex-col items-center justify-center gap-3 border-2 border-ink bg-paper px-4 py-5 text-center shadow-hard-4 shadow-lilac">
+          <p class={SUMMARY_TAG_CLASS}>
+            <span class="sr-only">Category: </span>
+            <span data-prompt-category></span>
+          </p>
+          <p
+            data-prompt
+            tabindex="-1"
+            class="text-[clamp(1.375rem,1.1rem+1.25vw,1.875rem)] leading-tight font-bold focus:outline-none"
+          ></p>
+        </div>
+
+        <form data-guess-form class="flex flex-col items-center gap-3">
+          <label for="year-input" class={label}>
+            Your guess
+          </label>
+          <input
+            id="year-input"
+            data-year-input
+            type="number"
+            inputmode="numeric"
+            step="1"
+            autocomplete="off"
+            class="no-spinner w-44 border-2 border-ink bg-paper px-2 pt-1 text-center font-terminal text-[3.5rem] leading-none tracking-label text-ink shadow-hard-4 shadow-pink focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-violet"
+          />
+          <input data-year-slider type="range" step="1" aria-label="Year" class="range-retro w-full" />
+          <div class="flex flex-wrap justify-center gap-2" role="group" aria-label="Nudge the year">
+            {nudges.map((n) => (
+              <Button
+                data-nudge={String(n)}
+                variant="secondary"
+                aria-label={`${n > 0 ? 'Plus' : 'Minus'} ${Math.abs(n)} ${Math.abs(n) === 1 ? 'year' : 'years'}`}
+              >
+                {n > 0 ? `+${n}` : `−${Math.abs(n)}`}
+              </Button>
+            ))}
+          </div>
+          <Button type="submit" size="lg">
+            Lock in
+          </Button>
+        </form>
+      </section>
+
+      <section data-screen="reveal" hidden class="flex flex-col items-start gap-3">
+        <p data-reveal-prompt class="text-body-lg font-semibold"></p>
+        <h2
+          data-reveal-title
+          tabindex="-1"
+          class="font-terminal text-[clamp(3rem,2.5rem+2vw,4rem)] leading-none tracking-label text-ink focus:outline-none"
+        >
+          2007
+        </h2>
+        {/* This round's guesses, then the running totals, labelled and tinted differently. Solo is a party of one. */}
+        <div class="flex w-full max-w-80 flex-col gap-1.5">
+          <h3 id="round-heading" class={label}>
+            This round
+          </h3>
+          <table aria-labelledby="round-heading" class="w-full border-separate border-spacing-y-1 text-body">
+            <thead>
+              <tr class="text-left font-terminal text-label-sm tracking-label text-ink-soft">
+                <th scope="col" class="px-3 font-normal">
+                  Player
+                </th>
+                <th scope="col" class="px-3 font-normal">
+                  Guess
+                </th>
+                <th scope="col" class="px-3 text-right font-normal">
+                  Points
+                </th>
+              </tr>
+            </thead>
+            <tbody data-reveal-rows></tbody>
+          </table>
+        </div>
+        <div class="flex w-full max-w-80 flex-col gap-1.5">
+          <h3 id="totals-heading" class={label}>
+            Total scores
+          </h3>
+          <ol data-scoreboard class={scoreboard} aria-labelledby="totals-heading"></ol>
+        </div>
+        <div class="flex w-full flex-wrap items-center justify-between gap-2.5">
+          <Button data-next size="lg">
+            Next question
+          </Button>
+          <TextButton data-end-game size="md">
+            End game
+          </TextButton>
+        </div>
+      </section>
+
+      <section data-screen="results" hidden class="flex flex-col items-start gap-3">
+        <h2 data-result-title tabindex="-1" class={heading}>
+          Results
+        </h2>
+        <p data-result-best hidden class={BEST_TAG_CLASS}></p>
+        <div data-party-only hidden class="flex w-full max-w-80 flex-col gap-1.5">
+          <h3 id="final-heading" class={label}>
+            Total scores
+          </h3>
+          <ol data-scoreboard class={scoreboard} aria-labelledby="final-heading"></ol>
+        </div>
+        <ul data-result-list class="flex w-full flex-col gap-1.5 text-body" aria-label="Every question"></ul>
+        <div class="flex flex-wrap gap-2.5">
+          <Button data-again icon="play">
+            Play again
+          </Button>
+          <Button data-open-settings variant="secondary" icon="sliders">
+            Settings
+          </Button>
+        </div>
+      </section>
+
+      <SettingsDialog summary={summary}>
+        <ChipGroup
+          legend="Play"
+          name="mode"
+          type="radio"
+          options={MODES.map((m) => ({ value: m, label: MODE_LABELS[m] }))}
+          checked={[DEFAULT_SETTINGS.mode]}
+        />
+        <PlayerNamesField
+          legend="Players"
+          max={MAX_PLAYERS}
+          initial={DEFAULT_SETTINGS.players.length}
+          maxLength={PLAYER_NAME_MAX}
+        />
+        <ChipGroup
+          legend="Questions"
+          name="length"
+          type="radio"
+          options={LENGTHS.map((l) => ({ value: String(l), label: String(l) }))}
+          checked={[String(DEFAULT_SETTINGS.length)]}
+        />
+        <PickSeveralField
+          legend="Categories"
+          name="category"
+          options={CATEGORIES.map((c) => ({ value: c, label: CATEGORY_LABELS[c], note: String(prompts[c].length) }))}
+        />
+        <ChipGroup
+          legend="Era"
+          name="era"
+          type="radio"
+          options={ERAS.map((e) => ({ value: e, label: ERA_LABELS[e] }))}
+          checked={[DEFAULT_SETTINGS.era]}
+        />
+        <div data-timer-field class="w-full">
+          <ChipGroup
+            legend="Timer"
+            name="timer"
+            type="radio"
+            options={TIMERS.map((t) => ({ value: t, label: TIMER_LABELS[t] }))}
+            checked={[DEFAULT_SETTINGS.timer]}
+          />
+        </div>
+      </SettingsDialog>
+    </div>
+  </Window>
+</BaseLayout>
+
+<script>
+  import { initGuessTheYear } from '../../scripts/guess-the-year/game';
+
+  const root = document.querySelector<HTMLElement>('[data-guess-the-year]');
+  if (root) initGuessTheYear(root);
+</script>

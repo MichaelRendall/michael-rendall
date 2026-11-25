@@ -1,0 +1,234 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Button from '../../components/Button.astro';
+import TextButton from '../../components/TextButton.astro';
+import Window from '../../components/Window.astro';
+import ChipGroup from '../../components/settings/ChipGroup.astro';
+import PickSeveralField from '../../components/settings/PickSeveralField.astro';
+import PlayerNamesField from '../../components/settings/PlayerNamesField.astro';
+import SettingsDialog from '../../components/settings/SettingsDialog.astro';
+import SummaryTags from '../../components/settings/SummaryTags.astro';
+import { SUMMARY_TAG_CLASS } from '../../scripts/settings-dialog';
+import { CATEGORIES, CATEGORY_LABELS, words } from '../../data/blend-in-words';
+import {
+  CLUE_ROUND_OPTIONS,
+  DEFAULT_SETTINGS,
+  DISCUSS_OPTIONS,
+  MAX_PLAYERS,
+  MODES,
+  MODE_LABELS,
+  PLAYER_NAME_MAX,
+  describe,
+  discussLabel,
+} from '../../scripts/blend-in/settings';
+
+const label = 'font-terminal text-label tracking-label';
+const heading = 'font-pixel text-label-xl font-bold focus:outline-none';
+const summary = describe(DEFAULT_SETTINGS);
+const scoreboard = 'flex w-full max-w-80 flex-col gap-1 text-body';
+---
+
+<BaseLayout
+  page="games"
+  title="Blend In, Michael Rendall"
+  description="One of you doesn't know the secret word. Give clues, spot the bluffer, and blend in."
+>
+  <Window
+    as="main"
+    id="main"
+    title="blend_in.exe"
+    aria-labelledby="game-title"
+    class="mx-auto w-full max-w-136 shadow-hard-8 shadow-teal"
+  >
+    <div data-blend-in class="flex flex-col gap-4 p-[clamp(1.25rem,2.5vw,1.75rem)]">
+      <h1
+        id="game-title"
+        class="text-chrome font-pixel text-[clamp(1.75rem,1.25rem+1.5vw,2.5rem)] leading-[1.08] font-bold"
+      >
+        Blend In
+      </h1>
+
+      <section data-screen="start" class="flex flex-col items-start gap-3">
+        <p class="text-body leading-[1.6] text-ink-soft">
+          Everyone gets the secret word except the outsider. Give clues, spot the bluffer, and if you're the outsider:
+          blend in.
+        </p>
+        <details class="w-full border-2 border-ink bg-paper px-3 py-2 text-body leading-[1.6]">
+          <summary class="cursor-pointer font-terminal text-label tracking-label">How to play</summary>
+          <ol class="mt-2 flex list-decimal flex-col gap-1.5 pl-5">
+            <li>
+              Pass the phone round. Everyone privately sees the secret word, except the outsider, who only sees the
+              category.
+            </li>
+            <li>
+              Going round the circle, everyone says one word linked to the secret word. Prove you know it, but not so
+              obviously that the outsider can work it out.
+            </li>
+            <li>Discuss who's bluffing, then on the count of three, everyone points at their suspect.</li>
+            <li>
+              Wrong person? The outsider escapes and scores 2. Caught? The outsider gets one guess at the word: right
+              scores them 1, wrong scores everyone else 1.
+            </li>
+            <li>Undercover mode: the outsider gets a similar word instead and doesn't know they're the outsider.</li>
+          </ol>
+        </details>
+        <SummaryTags parts={summary} />
+        <div class="flex flex-wrap gap-2.5">
+          <Button data-start icon="play">
+            Start game
+          </Button>
+          <Button data-open-settings variant="secondary" icon="sliders">
+            Settings
+          </Button>
+        </div>
+        <noscript>
+          <p class="text-body">The game needs JavaScript to run.</p>
+        </noscript>
+      </section>
+
+      <section data-screen="pass" hidden class="flex flex-col items-start gap-3">
+        <h2 data-pass-title tabindex="-1" class={heading}>
+          Pass to Player 1
+        </h2>
+        <p class="text-body text-ink-soft">Only they should look. Everyone else, eyes away.</p>
+        <Button data-show-card size="lg">
+          Show my card
+        </Button>
+        <div data-card hidden class="flex w-full flex-col items-start gap-3">
+          <div class="flex min-h-40 w-full flex-col items-center justify-center gap-2 border-2 border-ink bg-paper px-4 py-6 text-center shadow-hard-4 shadow-lilac">
+            <p data-card-heading class={label}></p>
+            <p data-card-word class="text-[clamp(1.75rem,1.25rem+2vw,2.75rem)] leading-tight font-bold"></p>
+            {/* The category as a tag, like the settings summary. Its visually hidden label reads "Category:". */}
+            <p class={SUMMARY_TAG_CLASS}>
+              <span class="sr-only">Category: </span>
+              <span data-card-category></span>
+            </p>
+            <p data-card-note class="text-body-sm text-ink-soft"></p>
+          </div>
+          <Button data-hide-card size="lg" variant="secondary">
+            Hide and pass on
+          </Button>
+        </div>
+      </section>
+
+      <section data-screen="clues" hidden class="flex flex-col items-start gap-3">
+        <h2 data-clues-title tabindex="-1" class={heading}>
+          Clue time
+        </h2>
+        <p data-clues-text class="text-body-lg leading-[1.6]"></p>
+        <Button data-clues-done size="lg">
+          Time to discuss
+        </Button>
+      </section>
+
+      <section data-screen="vote" hidden class="flex flex-col gap-3">
+        <h2 id="vote-title" data-vote-title tabindex="-1" class={heading}>
+          Who's the outsider?
+        </h2>
+        <div data-clock-wrap hidden aria-hidden="true" class="flex items-center gap-3">
+          <div class="h-3 grow border-2 border-ink bg-paper">
+            <div data-clock-bar class="h-full w-full bg-teal"></div>
+          </div>
+          <p data-clock class="font-terminal text-label-xl tabular-nums">
+            0:00
+          </p>
+        </div>
+        {/* Screen readers only: "Time to vote" when the discussion timer runs out. */}
+        <p data-announce aria-live="assertive" class="sr-only"></p>
+        <p class="text-body text-ink-soft">
+          Discuss, then on three, everyone points. Tap the person most of you picked.
+        </p>
+        <div data-vote-list role="group" aria-labelledby="vote-title" class="grid gap-2.5 sm:grid-cols-2"></div>
+      </section>
+
+      <section data-screen="guess" hidden class="flex flex-col items-start gap-3">
+        <h2 data-guess-title tabindex="-1" class={heading}>
+          Caught!
+        </h2>
+        <p data-guess-text class="text-body-lg leading-[1.6]"></p>
+        <div class="flex flex-wrap gap-2.5">
+          <Button data-guess-yes size="lg">
+            They guessed it
+          </Button>
+          <Button data-guess-no size="lg" variant="secondary">
+            They didn't
+          </Button>
+        </div>
+      </section>
+
+      <section data-screen="result" hidden class="flex flex-col items-start gap-3">
+        <h2 data-result-title tabindex="-1" class={heading}>
+          Result
+        </h2>
+        <p data-result-words class="text-body-lg font-semibold"></p>
+        <p data-result-points class="text-body text-ink-soft"></p>
+        <ol data-scoreboard class={scoreboard} aria-label="Scores"></ol>
+        <div class="flex w-full flex-wrap items-center justify-between gap-2.5">
+          <Button data-next-round size="lg" icon="play">
+            Next round
+          </Button>
+          <TextButton data-end-game size="md">
+            End game
+          </TextButton>
+        </div>
+      </section>
+
+      <section data-screen="final" hidden class="flex flex-col items-start gap-3">
+        <h2 data-final-title tabindex="-1" class={heading}>
+          Results
+        </h2>
+        <ol data-scoreboard class={scoreboard} aria-label="Final scores"></ol>
+        <div class="flex flex-wrap gap-2.5">
+          <Button data-again icon="play">
+            Play again
+          </Button>
+          <Button data-open-settings variant="secondary" icon="sliders">
+            Settings
+          </Button>
+        </div>
+      </section>
+
+      <SettingsDialog summary={summary}>
+        <PlayerNamesField
+          legend="Players, in order round the circle"
+          max={MAX_PLAYERS}
+          initial={DEFAULT_SETTINGS.players.length}
+          maxLength={PLAYER_NAME_MAX}
+        />
+        <PickSeveralField
+          legend="Categories"
+          name="category"
+          options={CATEGORIES.map((c) => ({ value: c, label: CATEGORY_LABELS[c], note: String(words[c].length) }))}
+        />
+        <ChipGroup
+          legend="Mode"
+          name="mode"
+          type="radio"
+          options={MODES.map((m) => ({ value: m, label: MODE_LABELS[m] }))}
+          checked={[DEFAULT_SETTINGS.mode]}
+        />
+        <ChipGroup
+          legend="Clue rounds"
+          name="clue-rounds"
+          type="radio"
+          options={CLUE_ROUND_OPTIONS.map((r) => ({ value: String(r), label: String(r) }))}
+          checked={[String(DEFAULT_SETTINGS.clueRounds)]}
+        />
+        <ChipGroup
+          legend="Discussion timer"
+          name="discuss"
+          type="radio"
+          options={DISCUSS_OPTIONS.map((s) => ({ value: String(s), label: discussLabel(s) }))}
+          checked={[String(DEFAULT_SETTINGS.discussSeconds)]}
+        />
+      </SettingsDialog>
+    </div>
+  </Window>
+</BaseLayout>
+
+<script>
+  import { initBlendIn } from '../../scripts/blend-in/game';
+
+  const root = document.querySelector<HTMLElement>('[data-blend-in]');
+  if (root) initBlendIn(root);
+</script>

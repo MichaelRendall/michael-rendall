@@ -1,0 +1,46 @@
+---
+// A settings list of player names with Remove and Add player, for games with named players (Blend In,
+// Guess the Year's party mode). src/scripts/player-list.ts runs it.
+import TextButton from '../TextButton.astro';
+
+interface Props {
+  legend: string;
+  /** The most players allowed: this many rows are rendered and the extra ones stay hidden. */
+  max: number;
+  /** Rows shown before the game's script applies the saved list. */
+  initial: number;
+  maxLength: number;
+}
+
+const { legend, max, initial, maxLength } = Astro.props;
+---
+
+<fieldset data-player-list class="flex w-full flex-col gap-1.5">
+  <legend class="mb-1.5 font-terminal text-label tracking-label">{legend}</legend>
+  <div class="flex w-full flex-col gap-2">
+    {Array.from({ length: max }, (_, i) => (
+      <div data-player-row hidden={i >= initial} class="flex items-center gap-2">
+        <input
+          name="player"
+          type="text"
+          maxlength={maxLength}
+          placeholder={`Player ${i + 1}`}
+          aria-label={`Player ${i + 1}`}
+          autocomplete="off"
+          spellcheck="false"
+          data-1p-ignore
+          data-lpignore="true"
+          data-bwignore
+          data-form-type="other"
+          class="min-h-10 w-full border-2 border-ink bg-white px-2 font-sans text-body tracking-normal text-ink placeholder:text-ink-soft focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-violet"
+        />
+        <TextButton data-remove-player aria-label={`Remove player ${i + 1}`}>
+          Remove
+        </TextButton>
+      </div>
+    ))}
+  </div>
+  <div class="mt-1">
+    <TextButton data-add-player>Add player</TextButton>
+  </div>
+</fieldset>
